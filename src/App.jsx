@@ -2,26 +2,55 @@ import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/ap
 import { useState } from "react";
 
 const center = {
-  lat: 37.2266,
-  lng: 127.1872,
+  lat: 37.2205,
+  lng: 127.186,
 };
 
 const cracks = [
   {
     id: 1,
-    lat: 37.2266,
-    lng: 127.1872,
-    name: "균열 A",
+    lat: 37.21913,
+    lng: 127.18441,
+    name: "균열 1",
     pci: 72,
-    desc: "종방향 균열",
+    desc: "도로 균열",
+    image: "/crack1.jpg",
   },
   {
-    id: 2,
-    lat: 37.227,
-    lng: 127.188,
-    name: "균열 B",
-    pci: 65,
-    desc: "횡방향 균열",
+    id: 40,
+    lat: 37.22007,
+    lng: 127.18572,
+    name: "균열 40",
+    pci: 70,
+    desc: "도로 균열",
+    image: "/crack40.jpg",
+  },
+  {
+    id: 80,
+    lat: 37.22067,
+    lng: 127.1868,
+    name: "균열 80",
+    pci: 68,
+    desc: "도로 균열",
+    image: "/crack80.jpg",
+  },
+  {
+    id: 130,
+    lat: 37.22124,
+    lng: 127.18773,
+    name: "균열 130",
+    pci: 66,
+    desc: "도로 균열",
+    image: "/crack130.jpg",
+  },
+  {
+    id: 190,
+    lat: 37.22146,
+    lng: 127.18806,
+    name: "균열 190",
+    pci: 64,
+    desc: "도로 균열",
+    image: "/crack190.jpg",
   },
 ];
 
@@ -48,11 +77,19 @@ function App() {
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div>
+            <div style={{ width: "220px" }}>
               <h3>{selected.name}</h3>
-              <p>PCI: {selected.pci}</p>
-              <p>{selected.desc}</p>
-              <p>여기에 사진 넣을 예정</p>
+
+              <img
+                src={selected.image}
+                alt={selected.name}
+                style={{ width: "100%", marginBottom: "10px" }}
+              />
+
+              <p><strong>PCI:</strong> {selected.pci}</p>
+              <p><strong>설명:</strong> {selected.desc}</p>
+              <p><strong>위도:</strong> {selected.lat}</p>
+              <p><strong>경도:</strong> {selected.lng}</p>
             </div>
           </InfoWindow>
         )}
