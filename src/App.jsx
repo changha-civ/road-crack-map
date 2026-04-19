@@ -69,6 +69,12 @@ function App() {
             key={crack.id}
             position={{ lat: crack.lat, lng: crack.lng }}
             onClick={() => setSelected(crack)}
+            label={{
+              text: String(crack.id),
+              color: "white",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}
           />
         ))}
 
@@ -77,13 +83,17 @@ function App() {
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "220px" }}>
-              <h3>{selected.name}</h3>
+            <div style={{ width: "230px" }}>
+              <h3 style={{ marginBottom: "8px" }}>{selected.name}</h3>
 
               <img
                 src={selected.image}
                 alt={selected.name}
-                style={{ width: "100%", marginBottom: "10px" }}
+                style={{
+                  width: "100%",
+                  marginBottom: "10px",
+                  borderRadius: "8px",
+                }}
               />
 
               <p><strong>PCI:</strong> {selected.pci}</p>
