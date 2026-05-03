@@ -78,6 +78,9 @@ const getMarkerIcon = (pci) => {
     strokeColor: "white",
     strokeWeight: 2,
     scale: 1.8,
+
+    // 🔥 이게 핵심 (숫자 위치 수정)
+    labelOrigin: { x: 12, y: 9 },
   };
 };
 
@@ -93,7 +96,7 @@ function App() {
         zoom={17}
       >
 
-        {/* 🔥 제목 UI */}
+        {/* 제목 */}
         <div
           style={{
             position: "absolute",
@@ -183,13 +186,11 @@ function App() {
             onCloseClick={() => setSelected(null)}
           >
             <div style={{ width: "380px", fontSize: "14px" }}>
-              <h3 style={{ marginBottom: "8px" }}>
-                {selected.name} (균열 위치)
-              </h3>
+              <h3>{selected.name} (균열 위치)</h3>
 
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ width: "50%" }}>
-                  <p style={{ fontWeight: "bold" }}>보수 전</p>
+                  <p><strong>보수 전</strong></p>
                   <img
                     src={selected.imageBefore}
                     style={{
@@ -202,7 +203,7 @@ function App() {
                 </div>
 
                 <div style={{ width: "50%" }}>
-                  <p style={{ fontWeight: "bold" }}>보수 후</p>
+                  <p><strong>보수 후</strong></p>
                   <img
                     src={selected.imageAfter}
                     style={{
@@ -219,12 +220,9 @@ function App() {
                 PCI: {selected.pciBefore} → {selected.pciAfter}
               </p>
 
-              <p style={{ fontSize: "14px" }}>
+              <p>
                 <strong>설명:</strong> {selected.desc}
               </p>
-
-              <p>위도: {selected.lat}</p>
-              <p>경도: {selected.lng}</p>
             </div>
           </InfoWindow>
         )}
