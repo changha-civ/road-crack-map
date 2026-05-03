@@ -25,7 +25,7 @@ const cracks = [
     name: "균열 40",
     pciBefore: 30,
     pciAfter: 82,
-    desc: "거북등 균열, 도색 손상 및 패치부 손상",
+    desc: "거북등 균열 및 패치 손상",
     imageBefore: "/crack40.jpg",
     imageAfter: "/repair40.jpg",
   },
@@ -47,7 +47,7 @@ const cracks = [
     name: "균열 130",
     pciBefore: 50,
     pciAfter: 87,
-    desc: "종방향 균열 및 분기형 균열",
+    desc: "종방향 균열",
     imageBefore: "/crack130.jpg",
     imageAfter: "/repair130.jpg",
   },
@@ -92,10 +92,12 @@ function App() {
         center={center}
         zoom={17}
       >
+
+        {/* 버튼 UI */}
         <div
           style={{
             position: "absolute",
-            top: "12px",
+            top: "80px",
             left: "12px",
             zIndex: 10,
             backgroundColor: "white",
@@ -104,12 +106,37 @@ function App() {
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
           }}
         >
-          <button onClick={() => setShowAfter(false)}>보수 전</button>
-          <button onClick={() => setShowAfter(true)} style={{ marginLeft: "6px" }}>
+          <button
+            onClick={() => setShowAfter(false)}
+            style={{
+              backgroundColor: showAfter ? "#eee" : "#3498db",
+              color: showAfter ? "black" : "white",
+              border: "none",
+              padding: "6px 10px",
+              borderRadius: "6px",
+              cursor: "pointer"
+            }}
+          >
+            보수 전
+          </button>
+
+          <button
+            onClick={() => setShowAfter(true)}
+            style={{
+              backgroundColor: showAfter ? "#3498db" : "#eee",
+              color: showAfter ? "white" : "black",
+              border: "none",
+              padding: "6px 10px",
+              borderRadius: "6px",
+              marginLeft: "6px",
+              cursor: "pointer"
+            }}
+          >
             보수 후
           </button>
         </div>
 
+        {/* 마커 */}
         {cracks.map((crack) => {
           const pci = showAfter ? crack.pciAfter : crack.pciBefore;
 
@@ -122,27 +149,29 @@ function App() {
               label={{
                 text: String(crack.id),
                 color: "white",
-                fontSize: "12px",
+                fontSize: "14px",
                 fontWeight: "bold",
               }}
             />
           );
         })}
 
+        {/* 정보창 */}
         {selected && (
           <InfoWindow
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "380px" }}>
-              <h3 style={{ marginBottom: "8px" }}>{selected.name}</h3>
+            <div style={{ width: "380px", fontSize: "14px" }}>
+              <h3 style={{ marginBottom: "8px" }}>
+                {selected.name} (균열 위치)
+              </h3>
 
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ width: "50%" }}>
-                  <p style={{ margin: "4px 0", fontWeight: "bold" }}>보수 전</p>
+                  <p style={{ fontWeight: "bold" }}>보수 전</p>
                   <img
                     src={selected.imageBefore}
-                    alt={`${selected.name} 보수 전`}
                     style={{
                       width: "100%",
                       height: "130px",
@@ -153,10 +182,9 @@ function App() {
                 </div>
 
                 <div style={{ width: "50%" }}>
-                  <p style={{ margin: "4px 0", fontWeight: "bold" }}>보수 후</p>
+                  <p style={{ fontWeight: "bold" }}>보수 후</p>
                   <img
                     src={selected.imageAfter}
-                    alt={`${selected.name} 보수 후`}
                     style={{
                       width: "100%",
                       height: "130px",
@@ -167,18 +195,16 @@ function App() {
                 </div>
               </div>
 
-              <p>
-                <strong>PCI 변화:</strong> {selected.pciBefore} → {selected.pciAfter}
+              <p style={{ fontSize: "17px", fontWeight: "bold", color: "#2c3e50" }}>
+                PCI: {selected.pciBefore} → {selected.pciAfter}
               </p>
-              <p>
+
+              <p style={{ fontSize: "14px" }}>
                 <strong>설명:</strong> {selected.desc}
               </p>
-              <p>
-                <strong>위도:</strong> {selected.lat}
-              </p>
-              <p>
-                <strong>경도:</strong> {selected.lng}
-              </p>
+
+              <p>위도: {selected.lat}</p>
+              <p>경도: {selected.lng}</p>
             </div>
           </InfoWindow>
         )}
