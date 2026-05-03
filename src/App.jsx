@@ -93,7 +93,27 @@ function App() {
         zoom={17}
       >
 
-        {/* 버튼 UI */}
+        {/* 🔥 제목 UI */}
+        <div
+          style={{
+            position: "absolute",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 10,
+            backgroundColor: "#2c3e50",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "12px",
+            fontWeight: "bold",
+            fontSize: "18px",
+            boxShadow: "0 3px 10px rgba(0,0,0,0.3)"
+          }}
+        >
+          🚧 도로 균열 관리 시스템
+        </div>
+
+        {/* 버튼 */}
         <div
           style={{
             position: "absolute",
