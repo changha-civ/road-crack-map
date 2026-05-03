@@ -15,8 +15,8 @@ const cracks = [
     pciBefore: 60,
     pciAfter: 90,
     desc: "블록 균열 및 초기 거북등 균열",
-    image: "/crack1.jpg",
-    repairedImage: "/repair1.jpg",
+    imageBefore: "/crack1.jpg",
+    imageAfter: "/repair1.jpg",
   },
   {
     id: 40,
@@ -26,8 +26,8 @@ const cracks = [
     pciBefore: 30,
     pciAfter: 82,
     desc: "거북등 균열, 도색 손상 및 패치부 손상",
-    image: "/crack40.jpg",
-    repairedImage: "/repair40.jpg",
+    imageBefore: "/crack40.jpg",
+    imageAfter: "/repair40.jpg",
   },
   {
     id: 80,
@@ -37,8 +37,8 @@ const cracks = [
     pciBefore: 55,
     pciAfter: 88,
     desc: "광범위한 블록 균열",
-    image: "/crack80.jpg",
-    repairedImage: "/repair80.jpg",
+    imageBefore: "/crack80.jpg",
+    imageAfter: "/repair80.jpg",
   },
   {
     id: 130,
@@ -48,8 +48,8 @@ const cracks = [
     pciBefore: 50,
     pciAfter: 87,
     desc: "종방향 균열 및 분기형 균열",
-    image: "/crack130.jpg",
-    repairedImage: "/repair130.jpg",
+    imageBefore: "/crack130.jpg",
+    imageAfter: "/repair130.jpg",
   },
   {
     id: 190,
@@ -59,18 +59,17 @@ const cracks = [
     pciBefore: 25,
     pciAfter: 85,
     desc: "심각한 거북등 균열",
-    image: "/crack190.jpg",
-    repairedImage: "/repair190.jpg",
+    imageBefore: "/crack190.jpg",
+    imageAfter: "/repair190.jpg",
   },
 ];
 
-// 🔥 안전한 색상 마커 (window.google 안 씀)
 const getMarkerIcon = (pci) => {
-  let color = "#e74c3c"; // 빨강
+  let color = "#e74c3c";
 
-  if (pci >= 85) color = "#2ecc71"; // 초록
-  else if (pci >= 70) color = "#f1c40f"; // 노랑
-  else if (pci >= 40) color = "#e67e22"; // 주황
+  if (pci >= 85) color = "#2ecc71";
+  else if (pci >= 70) color = "#f1c40f";
+  else if (pci >= 40) color = "#e67e22";
 
   return {
     path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",
@@ -93,7 +92,6 @@ function App() {
         center={center}
         zoom={17}
       >
-        {/* 버튼 */}
         <div
           style={{
             position: "absolute",
@@ -112,7 +110,6 @@ function App() {
           </button>
         </div>
 
-        {/* 마커 */}
         {cracks.map((crack) => {
           const pci = showAfter ? crack.pciAfter : crack.pciBefore;
 
@@ -132,24 +129,56 @@ function App() {
           );
         })}
 
-        {/* 정보창 */}
         {selected && (
           <InfoWindow
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "360px" }}>
-              <h3>{selected.name}</h3>
+            <div style={{ width: "380px" }}>
+              <h3 style={{ marginBottom: "8px" }}>{selected.name}</h3>
 
               <div style={{ display: "flex", gap: "8px" }}>
-                <img src={selected.image} style={{ width: "50%" }} />
-                <img src={selected.repairedImage} style={{ width: "50%" }} />
+                <div style={{ width: "50%" }}>
+                  <p style={{ margin: "4px 0", fontWeight: "bold" }}>보수 전</p>
+                  <img
+                    src={selected.imageBefore}
+                    alt={`${selected.name} 보수 전`}
+                    style={{
+                      width: "100%",
+                      height: "130px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </div>
+
+                <div style={{ width: "50%" }}>
+                  <p style={{ margin: "4px 0", fontWeight: "bold" }}>보수 후</p>
+                  <img
+                    src={selected.imageAfter}
+                    alt={`${selected.name} 보수 후`}
+                    style={{
+                      width: "100%",
+                      height: "130px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </div>
               </div>
 
               <p>
-                PCI: {selected.pciBefore} → {selected.pciAfter}
+                <strong>PCI 변화:</strong> {selected.pciBefore} → {selected.pciAfter}
               </p>
-              <p>{selected.desc}</p>
+              <p>
+                <strong>설명:</strong> {selected.desc}
+              </p>
+              <p>
+                <strong>위도:</strong> {selected.lat}
+              </p>
+              <p>
+                <strong>경도:</strong> {selected.lng}
+              </p>
             </div>
           </InfoWindow>
         )}
