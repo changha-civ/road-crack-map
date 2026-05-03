@@ -64,6 +64,7 @@ const cracks = [
   },
 ];
 
+// 🔥 안전한 색상 마커 (window.google 안 씀)
 const getMarkerIcon = (pci) => {
   let color = "#e74c3c"; // 빨강
 
@@ -78,8 +79,6 @@ const getMarkerIcon = (pci) => {
     strokeColor: "white",
     strokeWeight: 2,
     scale: 1.8,
-    labelOrigin: new window.google.maps.Point(12, 9),
-    anchor: new window.google.maps.Point(12, 24),
   };
 };
 
