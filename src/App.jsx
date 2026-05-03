@@ -25,7 +25,7 @@ const cracks = [
     name: "균열 40",
     pciBefore: 30,
     pciAfter: 82,
-    desc: "거북등 균열 및 패치 손상",
+    desc: "거북등 균열",
     imageBefore: "/crack40.jpg",
     imageAfter: "/repair40.jpg",
   },
@@ -36,7 +36,7 @@ const cracks = [
     name: "균열 80",
     pciBefore: 55,
     pciAfter: 88,
-    desc: "광범위한 블록 균열",
+    desc: "블록 균열",
     imageBefore: "/crack80.jpg",
     imageAfter: "/repair80.jpg",
   },
@@ -78,8 +78,6 @@ const getMarkerIcon = (pci) => {
     strokeColor: "white",
     strokeWeight: 2,
     scale: 1.8,
-
-    // 🔥 이게 핵심 (숫자 위치 수정)
     labelOrigin: { x: 12, y: 9 },
   };
 };
@@ -129,34 +127,31 @@ function App() {
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
           }}
         >
-          <button
-            onClick={() => setShowAfter(false)}
-            style={{
-              backgroundColor: showAfter ? "#eee" : "#3498db",
-              color: showAfter ? "black" : "white",
-              border: "none",
-              padding: "6px 10px",
-              borderRadius: "6px",
-              cursor: "pointer"
-            }}
-          >
-            보수 전
-          </button>
-
-          <button
-            onClick={() => setShowAfter(true)}
-            style={{
-              backgroundColor: showAfter ? "#3498db" : "#eee",
-              color: showAfter ? "white" : "black",
-              border: "none",
-              padding: "6px 10px",
-              borderRadius: "6px",
-              marginLeft: "6px",
-              cursor: "pointer"
-            }}
-          >
+          <button onClick={() => setShowAfter(false)}>보수 전</button>
+          <button onClick={() => setShowAfter(true)} style={{ marginLeft: "6px" }}>
             보수 후
           </button>
+        </div>
+
+        {/* 🔥 범례 (오른쪽 위) */}
+        <div
+          style={{
+            position: "absolute",
+            top: "80px",
+            right: "12px",
+            zIndex: 10,
+            backgroundColor: "white",
+            padding: "10px",
+            borderRadius: "10px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+            fontSize: "13px",
+          }}
+        >
+          <div><strong>PCI 범례</strong></div>
+          🟢 85 이상 (양호)<br/>
+          🟡 70~85 (보통)<br/>
+          🟠 40~70 (불량)<br/>
+          🔴 40 이하 (심각)
         </div>
 
         {/* 마커 */}
@@ -185,44 +180,26 @@ function App() {
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "380px", fontSize: "14px" }}>
-              <h3>{selected.name} (균열 위치)</h3>
+            <div style={{ width: "380px" }}>
+              <h3>{selected.name}</h3>
 
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ width: "50%" }}>
                   <p><strong>보수 전</strong></p>
-                  <img
-                    src={selected.imageBefore}
-                    style={{
-                      width: "100%",
-                      height: "130px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
+                  <img src={selected.imageBefore} style={{ width: "100%" }} />
                 </div>
 
                 <div style={{ width: "50%" }}>
                   <p><strong>보수 후</strong></p>
-                  <img
-                    src={selected.imageAfter}
-                    style={{
-                      width: "100%",
-                      height: "130px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
+                  <img src={selected.imageAfter} style={{ width: "100%" }} />
                 </div>
               </div>
 
-              <p style={{ fontSize: "17px", fontWeight: "bold", color: "#2c3e50" }}>
+              <p style={{ fontSize: "17px", fontWeight: "bold" }}>
                 PCI: {selected.pciBefore} → {selected.pciAfter}
               </p>
 
-              <p>
-                <strong>설명:</strong> {selected.desc}
-              </p>
+              <p><strong>설명:</strong> {selected.desc}</p>
             </div>
           </InfoWindow>
         )}
