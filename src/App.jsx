@@ -42,6 +42,23 @@ const getMarkerIcon = () => ({
   labelOrigin: { x: 12, y: 9 },
 });
 
+const previewBoxStyle = {
+  marginTop: "5px",
+  backgroundColor: "white",
+  padding: "7px",
+  borderRadius: "7px",
+  fontSize: "12px",
+  whiteSpace: "pre-wrap",
+  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+};
+
+const imageStyle = {
+  width: "100%",
+  marginTop: "5px",
+  borderRadius: "8px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+};
+
 function App() {
   const [selected, setSelected] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
@@ -93,11 +110,11 @@ function App() {
             zIndex: 10,
             backgroundColor: "#2c3e50",
             color: "white",
-            padding: "10px 20px",
-            borderRadius: "12px",
+            padding: "11px 22px",
+            borderRadius: "14px",
             fontWeight: "bold",
             fontSize: "18px",
-            boxShadow: "0 3px 10px rgba(0,0,0,0.3)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
           }}
         >
           🚧 도로 균열 관리 시스템
@@ -111,20 +128,26 @@ function App() {
             zIndex: 10,
             backgroundColor: "white",
             padding: "12px",
-            borderRadius: "10px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+            borderRadius: "12px",
+            boxShadow: "0 3px 10px rgba(0,0,0,0.25)",
             fontSize: "13px",
             lineHeight: "1.6",
-            width: "270px",
+            width: "280px",
           }}
         >
-          <div><strong>데이터 기준</strong></div>
-          📷 2026-04-10 현장 촬영<br />
-          🛠️ 2026-05-10 보수 시뮬레이션
+          <div style={{ textAlign: "center", fontWeight: "bold", color: "#2c3e50" }}>
+            데이터 기준
+          </div>
+          <div style={{ textAlign: "center" }}>
+            📷 2026-04-10 현장 촬영<br />
+            🛠️ 2026-05-10 보수 시뮬레이션
+          </div>
 
           <hr style={{ margin: "8px 0" }} />
 
-          <div><strong>최종 데이터 관리 구조</strong></div>
+          <div style={{ textAlign: "center", fontWeight: "bold", color: "#2c3e50" }}>
+            최종 데이터 관리 구조
+          </div>
 
           {Object.keys(folderData).map((folder) => (
             <div
@@ -136,6 +159,9 @@ function App() {
                 cursor: "pointer",
                 color: selectedFolder === folder ? "#e74c3c" : "#2c3e50",
                 fontWeight: selectedFolder === folder ? "bold" : "normal",
+                padding: "2px 4px",
+                borderRadius: "5px",
+                backgroundColor: selectedFolder === folder ? "#fff0ec" : "transparent",
               }}
             >
               📁 {folder}
@@ -149,11 +175,11 @@ function App() {
                 padding: "8px",
                 backgroundColor: "#f5f5f5",
                 borderRadius: "8px",
-                maxHeight: "300px",
+                maxHeight: "250px",
                 overflowY: "auto",
               }}
             >
-              <strong>{selectedFolder}</strong>
+              <strong style={{ color: "#2c3e50" }}>{selectedFolder}</strong>
 
               {folderData[selectedFolder].map((file) => {
                 const isImageFolder =
@@ -177,44 +203,18 @@ function App() {
                       borderBottom: "1px solid #ddd",
                     }}
                   >
-                    <div>📄 {file}</div>
+                    <div style={{ fontWeight: "bold", color: "#555" }}>📄 {file}</div>
 
                     {isImageFolder ? (
-                      <img
-                        src={imagePath}
-                        alt={file}
-                        style={{
-                          width: "100%",
-                          marginTop: "5px",
-                          borderRadius: "6px",
-                        }}
-                      />
+                      <img src={imagePath} alt={file} style={imageStyle} />
                     ) : selectedFolder === "coordinates" ? (
-                      <div
-                        style={{
-                          marginTop: "5px",
-                          backgroundColor: "white",
-                          padding: "6px",
-                          borderRadius: "5px",
-                          fontSize: "12px",
-                          whiteSpace: "pre-wrap",
-                        }}
-                      >
+                      <div style={previewBoxStyle}>
                         위도: {crack?.lat}
                         <br />
                         경도: {crack?.lng}
                       </div>
                     ) : (
-                      <div
-                        style={{
-                          marginTop: "5px",
-                          backgroundColor: "white",
-                          padding: "6px",
-                          borderRadius: "5px",
-                          fontSize: "12px",
-                          whiteSpace: "pre-wrap",
-                        }}
-                      >
+                      <div style={previewBoxStyle}>
                         {textContents[textKey] || "불러오는 중..."}
                       </div>
                     )}
@@ -246,42 +246,57 @@ function App() {
             onCloseClick={() => setSelected(null)}
           >
             <div style={{ width: "430px" }}>
-              <h3 style={{ marginTop: 0 }}>{selected.name}</h3>
+              <h2
+                style={{
+                  marginTop: 0,
+                  marginBottom: "8px",
+                  color: "#2c3e50",
+                  borderBottom: "2px solid #eee",
+                  paddingBottom: "6px",
+                  textAlign: "center",
+                }}
+              >
+                {selected.name}
+              </h2>
 
-              <p>
+              <p style={{ textAlign: "center", margin: "6px 0" }}>
                 <strong>분류:</strong> {selected.desc}
               </p>
 
               <div
                 style={{
                   backgroundColor: "#f5f5f5",
-                  padding: "8px",
-                  borderRadius: "8px",
+                  padding: "10px",
+                  borderRadius: "10px",
                   marginBottom: "10px",
+                  textAlign: "center",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                 }}
               >
-                <strong>균열률 분석</strong><br />
+                <strong style={{ color: "#2c3e50" }}>균열률 분석</strong><br />
                 보수 전 균열률: {selected.beforeRate}%<br />
                 보수 후 균열률: {selected.afterRate}%<br />
-                감소율: {calcReduction(selected.beforeRate, selected.afterRate)}%
+                <span style={{ color: "#27ae60", fontWeight: "bold" }}>
+                  감소율: {calcReduction(selected.beforeRate, selected.afterRate)}%
+                </span>
               </div>
 
               <div style={{ display: "flex", gap: "8px" }}>
-                <div style={{ width: "50%" }}>
+                <div style={{ width: "50%", textAlign: "center" }}>
                   <p><strong>보수 전</strong><br />2026-04-10</p>
                   <img
                     src={selected.imageBefore}
                     alt="현장 촬영 이미지"
-                    style={{ width: "100%", borderRadius: "8px" }}
+                    style={imageStyle}
                   />
                 </div>
 
-                <div style={{ width: "50%" }}>
+                <div style={{ width: "50%", textAlign: "center" }}>
                   <p><strong>보수 후</strong><br />2026-05-10</p>
                   <img
                     src={selected.imageAfter}
                     alt="보수 시뮬레이션 이미지"
-                    style={{ width: "100%", borderRadius: "8px" }}
+                    style={imageStyle}
                   />
                 </div>
               </div>
