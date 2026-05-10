@@ -12,16 +12,16 @@ const cracks = [
     lat: 37.21913,
     lng: 127.18441,
     name: "균열 1",
-    desc: "블록 균열 및 초기 거북등 균열",
+    desc: "선형균열",
     imageBefore: "/images/crack1.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair1.jpg",
   },
   {
     id: 2,
     lat: 37.218956,
     lng: 127.184314,
     name: "균열 2",
-    desc: "추가 균열 데이터",
+    desc: "선형균열",
     imageBefore: "/images/crack2.jpg",
     imageAfter: null,
   },
@@ -30,7 +30,7 @@ const cracks = [
     lat: 37.219648,
     lng: 127.184668,
     name: "균열 20",
-    desc: "추가 균열 데이터",
+    desc: "선형균열",
     imageBefore: "/images/crack20.jpg",
     imageAfter: null,
   },
@@ -39,16 +39,16 @@ const cracks = [
     lat: 37.22007,
     lng: 127.18572,
     name: "균열 40",
-    desc: "거북등 균열",
+    desc: "망상균열",
     imageBefore: "/images/crack40.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair40.jpg",
   },
   {
     id: 60,
     lat: 37.220271,
     lng: 127.18659,
     name: "균열 60",
-    desc: "추가 균열 데이터",
+    desc: "망상균열",
     imageBefore: "/images/crack60.jpg",
     imageAfter: null,
   },
@@ -57,16 +57,16 @@ const cracks = [
     lat: 37.22067,
     lng: 127.1868,
     name: "균열 80",
-    desc: "블록 균열",
+    desc: "선형균열",
     imageBefore: "/images/crack80.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair80.jpg",
   },
   {
     id: 110,
     lat: 37.2212,
     lng: 127.187486,
     name: "균열 110",
-    desc: "추가 균열 데이터",
+    desc: "망상균열",
     imageBefore: "/images/crack110.jpg",
     imageAfter: null,
   },
@@ -75,16 +75,16 @@ const cracks = [
     lat: 37.22124,
     lng: 127.18773,
     name: "균열 130",
-    desc: "종방향 균열",
+    desc: "선형균열",
     imageBefore: "/images/crack130.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair130.jpg",
   },
   {
     id: 160,
     lat: 37.221404,
     lng: 127.187829,
     name: "균열 160",
-    desc: "추가 균열 데이터",
+    desc: "기타손상",
     imageBefore: "/images/crack160.jpg",
     imageAfter: null,
   },
@@ -93,9 +93,9 @@ const cracks = [
     lat: 37.22146,
     lng: 127.18806,
     name: "균열 190",
-    desc: "심각한 거북등 균열",
+    desc: "망상균열",
     imageBefore: "/images/crack190.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair190.jpg",
   },
 ];
 
@@ -155,7 +155,7 @@ function App() {
         >
           <div><strong>데이터 기준</strong></div>
           📷 2026-04-10 현장 촬영<br />
-          🛠️ 2026-05-10 보수 시뮬레이션 예정
+          🛠️ 2026-05-10 보수 시뮬레이션
         </div>
 
         {cracks.map((crack) => (
@@ -180,6 +180,10 @@ function App() {
           >
             <div style={{ width: "400px" }}>
               <h3>{selected.name}</h3>
+
+              <p>
+                <strong>분류:</strong> {selected.desc}
+              </p>
 
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ width: "50%" }}>
@@ -218,8 +222,6 @@ function App() {
                   )}
                 </div>
               </div>
-
-              <p><strong>설명:</strong> {selected.desc}</p>
             </div>
           </InfoWindow>
         )}
