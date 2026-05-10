@@ -12,68 +12,97 @@ const cracks = [
     lat: 37.21913,
     lng: 127.18441,
     name: "균열 1",
-    pciBefore: 60,
-    pciAfter: 90,
     desc: "블록 균열 및 초기 거북등 균열",
-    imageBefore: "/crack1.jpg",
-    imageAfter: "/repair1.jpg",
+    imageBefore: "/images/crack1.jpg",
+    imageAfter: null,
+  },
+  {
+    id: 2,
+    lat: 37.218956,
+    lng: 127.184314,
+    name: "균열 2",
+    desc: "추가 균열 데이터",
+    imageBefore: "/images/crack2.jpg",
+    imageAfter: null,
+  },
+  {
+    id: 20,
+    lat: 37.219648,
+    lng: 127.184668,
+    name: "균열 20",
+    desc: "추가 균열 데이터",
+    imageBefore: "/images/crack20.jpg",
+    imageAfter: null,
   },
   {
     id: 40,
     lat: 37.22007,
     lng: 127.18572,
     name: "균열 40",
-    pciBefore: 30,
-    pciAfter: 82,
     desc: "거북등 균열",
-    imageBefore: "/crack40.jpg",
-    imageAfter: "/repair40.jpg",
+    imageBefore: "/images/crack40.jpg",
+    imageAfter: null,
+  },
+  {
+    id: 60,
+    lat: 37.220271,
+    lng: 127.18659,
+    name: "균열 60",
+    desc: "추가 균열 데이터",
+    imageBefore: "/images/crack60.jpg",
+    imageAfter: null,
   },
   {
     id: 80,
     lat: 37.22067,
     lng: 127.1868,
     name: "균열 80",
-    pciBefore: 55,
-    pciAfter: 88,
     desc: "블록 균열",
-    imageBefore: "/crack80.jpg",
-    imageAfter: "/repair80.jpg",
+    imageBefore: "/images/crack80.jpg",
+    imageAfter: null,
+  },
+  {
+    id: 110,
+    lat: 37.2212,
+    lng: 127.187486,
+    name: "균열 110",
+    desc: "추가 균열 데이터",
+    imageBefore: "/images/crack110.jpg",
+    imageAfter: null,
   },
   {
     id: 130,
     lat: 37.22124,
     lng: 127.18773,
     name: "균열 130",
-    pciBefore: 50,
-    pciAfter: 87,
     desc: "종방향 균열",
-    imageBefore: "/crack130.jpg",
-    imageAfter: "/repair130.jpg",
+    imageBefore: "/images/crack130.jpg",
+    imageAfter: null,
+  },
+  {
+    id: 160,
+    lat: 37.221404,
+    lng: 127.187829,
+    name: "균열 160",
+    desc: "추가 균열 데이터",
+    imageBefore: "/images/crack160.jpg",
+    imageAfter: null,
   },
   {
     id: 190,
     lat: 37.22146,
     lng: 127.18806,
     name: "균열 190",
-    pciBefore: 25,
-    pciAfter: 85,
     desc: "심각한 거북등 균열",
-    imageBefore: "/crack190.jpg",
-    imageAfter: "/repair190.jpg",
+    imageBefore: "/images/crack190.jpg",
+    imageAfter: null,
   },
 ];
 
-const getMarkerIcon = (pci) => {
-  let color = "#e74c3c";
-
-  if (pci >= 85) color = "#2ecc71";
-  else if (pci >= 70) color = "#f1c40f";
-  else if (pci >= 40) color = "#e67e22";
-
+const getMarkerIcon = () => {
   return {
     path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",
-    fillColor: color,
+    fillColor: "#e74c3c",
     fillOpacity: 1,
     strokeColor: "white",
     strokeWeight: 2,
@@ -84,7 +113,6 @@ const getMarkerIcon = (pci) => {
 
 function App() {
   const [selected, setSelected] = useState(null);
-  const [showAfter, setShowAfter] = useState(false);
 
   return (
     <LoadScript googleMapsApiKey="AIzaSyCChGpVfC1kWBxgsikIZiwfdMLR7iA5kPw">
@@ -93,8 +121,6 @@ function App() {
         center={center}
         zoom={17}
       >
-
-        {/* 제목 */}
         <div
           style={{
             position: "absolute",
@@ -108,32 +134,12 @@ function App() {
             borderRadius: "12px",
             fontWeight: "bold",
             fontSize: "18px",
-            boxShadow: "0 3px 10px rgba(0,0,0,0.3)"
+            boxShadow: "0 3px 10px rgba(0,0,0,0.3)",
           }}
         >
           🚧 도로 균열 관리 시스템
         </div>
 
-        {/* 버튼 */}
-        <div
-          style={{
-            position: "absolute",
-            top: "80px",
-            left: "12px",
-            zIndex: 10,
-            backgroundColor: "white",
-            padding: "10px",
-            borderRadius: "10px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
-          }}
-        >
-          <button onClick={() => setShowAfter(false)}>보수 전</button>
-          <button onClick={() => setShowAfter(true)} style={{ marginLeft: "6px" }}>
-            보수 후
-          </button>
-        </div>
-
-        {/* 🔥 범례 (오른쪽 위) */}
         <div
           style={{
             position: "absolute",
@@ -147,57 +153,71 @@ function App() {
             fontSize: "13px",
           }}
         >
-          <div><strong>PCI 범례</strong></div>
-          🟢 85 이상 (양호)<br/>
-          🟡 70~85 (보통)<br/>
-          🟠 40~70 (불량)<br/>
-          🔴 40 이하 (심각)
+          <div><strong>데이터 기준</strong></div>
+          📷 2026-04-10 현장 촬영<br />
+          🛠️ 2026-05-10 보수 시뮬레이션 예정
         </div>
 
-        {/* 마커 */}
-        {cracks.map((crack) => {
-          const pci = showAfter ? crack.pciAfter : crack.pciBefore;
+        {cracks.map((crack) => (
+          <Marker
+            key={crack.id}
+            position={{ lat: crack.lat, lng: crack.lng }}
+            icon={getMarkerIcon()}
+            onClick={() => setSelected(crack)}
+            label={{
+              text: String(crack.id),
+              color: "white",
+              fontSize: "13px",
+              fontWeight: "bold",
+            }}
+          />
+        ))}
 
-          return (
-            <Marker
-              key={crack.id}
-              position={{ lat: crack.lat, lng: crack.lng }}
-              icon={getMarkerIcon(pci)}
-              onClick={() => setSelected(crack)}
-              label={{
-                text: String(crack.id),
-                color: "white",
-                fontSize: "14px",
-                fontWeight: "bold",
-              }}
-            />
-          );
-        })}
-
-        {/* 정보창 */}
         {selected && (
           <InfoWindow
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "380px" }}>
+            <div style={{ width: "400px" }}>
               <h3>{selected.name}</h3>
 
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ width: "50%" }}>
-                  <p><strong>보수 전</strong></p>
-                  <img src={selected.imageBefore} style={{ width: "100%" }} />
+                  <p><strong>2026-04-10</strong></p>
+                  <img
+                    src={selected.imageBefore}
+                    alt="현장 촬영 이미지"
+                    style={{ width: "100%", borderRadius: "8px" }}
+                  />
                 </div>
 
                 <div style={{ width: "50%" }}>
-                  <p><strong>보수 후</strong></p>
-                  <img src={selected.imageAfter} style={{ width: "100%" }} />
+                  <p><strong>2026-05-10</strong></p>
+                  {selected.imageAfter ? (
+                    <img
+                      src={selected.imageAfter}
+                      alt="보수 시뮬레이션 이미지"
+                      style={{ width: "100%", borderRadius: "8px" }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        height: "150px",
+                        backgroundColor: "#f1f1f1",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#777",
+                        borderRadius: "8px",
+                        textAlign: "center",
+                        padding: "10px",
+                      }}
+                    >
+                      보수 시뮬레이션 이미지<br />추후 추가 예정
+                    </div>
+                  )}
                 </div>
               </div>
-
-              <p style={{ fontSize: "17px", fontWeight: "bold" }}>
-                PCI: {selected.pciBefore} → {selected.pciAfter}
-              </p>
 
               <p><strong>설명:</strong> {selected.desc}</p>
             </div>
