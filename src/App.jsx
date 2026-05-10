@@ -7,107 +7,25 @@ const center = {
 };
 
 const cracks = [
-  {
-    id: 1,
-    lat: 37.21913,
-    lng: 127.18441,
-    name: "균열 1",
-    desc: "선형균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack1.jpg",
-    imageAfter: "/images/repair1.jpg",
-  },
-  {
-    id: 2,
-    lat: 37.218956,
-    lng: 127.184314,
-    name: "균열 2",
-    desc: "선형균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack2.jpg",
-    imageAfter: "/images/repair2.jpg",
-  },
-  {
-    id: 20,
-    lat: 37.219648,
-    lng: 127.184668,
-    name: "균열 20",
-    desc: "선형균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack20.jpg",
-    imageAfter: "/images/repair20.jpg",
-  },
-  {
-    id: 40,
-    lat: 37.22007,
-    lng: 127.18572,
-    name: "균열 40",
-    desc: "망상균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack40.jpg",
-    imageAfter: "/images/repair40.jpg",
-  },
-  {
-    id: 60,
-    lat: 37.220271,
-    lng: 127.18659,
-    name: "균열 60",
-    desc: "망상균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack60.jpg",
-    imageAfter: "/images/repair60.jpg",
-  },
-  {
-    id: 80,
-    lat: 37.22067,
-    lng: 127.1868,
-    name: "균열 80",
-    desc: "선형균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack80.jpg",
-    imageAfter: "/images/repair80.jpg",
-  },
-  {
-    id: 110,
-    lat: 37.2212,
-    lng: 127.187486,
-    name: "균열 110",
-    desc: "망상균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack110.jpg",
-    imageAfter: "/images/repair110.jpg",
-  },
-  {
-    id: 130,
-    lat: 37.22124,
-    lng: 127.18773,
-    name: "균열 130",
-    desc: "선형균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack130.jpg",
-    imageAfter: "/images/repair130.jpg",
-  },
-  {
-    id: 160,
-    lat: 37.221404,
-    lng: 127.187829,
-    name: "균열 160",
-    desc: "기타손상",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack160.jpg",
-    imageAfter: "/images/repair160.jpg",
-  },
-  {
-    id: 190,
-    lat: 37.22146,
-    lng: 127.18806,
-    name: "균열 190",
-    desc: "망상균열",
-    crackRate: "추가 예정",
-    imageBefore: "/images/crack190.jpg",
-    imageAfter: "/images/repair190.jpg",
-  },
+  { id: 1, lat: 37.21913, lng: 127.18441, name: "균열 1", desc: "선형균열", crackRate: "추가 예정", imageBefore: "/images/crack1.jpg", imageAfter: "/images/repair1.jpg" },
+  { id: 2, lat: 37.218956, lng: 127.184314, name: "균열 2", desc: "선형균열", crackRate: "추가 예정", imageBefore: "/images/crack2.jpg", imageAfter: "/images/repair2.jpg" },
+  { id: 20, lat: 37.219648, lng: 127.184668, name: "균열 20", desc: "선형균열", crackRate: "추가 예정", imageBefore: "/images/crack20.jpg", imageAfter: "/images/repair20.jpg" },
+  { id: 40, lat: 37.22007, lng: 127.18572, name: "균열 40", desc: "망상균열", crackRate: "추가 예정", imageBefore: "/images/crack40.jpg", imageAfter: "/images/repair40.jpg" },
+  { id: 60, lat: 37.220271, lng: 127.18659, name: "균열 60", desc: "망상균열", crackRate: "추가 예정", imageBefore: "/images/crack60.jpg", imageAfter: "/images/repair60.jpg" },
+  { id: 80, lat: 37.22067, lng: 127.1868, name: "균열 80", desc: "선형균열", crackRate: "추가 예정", imageBefore: "/images/crack80.jpg", imageAfter: "/images/repair80.jpg" },
+  { id: 110, lat: 37.2212, lng: 127.187486, name: "균열 110", desc: "망상균열", crackRate: "추가 예정", imageBefore: "/images/crack110.jpg", imageAfter: "/images/repair110.jpg" },
+  { id: 130, lat: 37.22124, lng: 127.18773, name: "균열 130", desc: "선형균열", crackRate: "추가 예정", imageBefore: "/images/crack130.jpg", imageAfter: "/images/repair130.jpg" },
+  { id: 160, lat: 37.221404, lng: 127.187829, name: "균열 160", desc: "기타손상", crackRate: "추가 예정", imageBefore: "/images/crack160.jpg", imageAfter: "/images/repair160.jpg" },
+  { id: 190, lat: 37.22146, lng: 127.18806, name: "균열 190", desc: "망상균열", crackRate: "추가 예정", imageBefore: "/images/crack190.jpg", imageAfter: "/images/repair190.jpg" },
 ];
+
+const folderData = {
+  before_repair: cracks.map((c) => `crack${c.id}.jpg`),
+  after_repair: cracks.map((c) => `repair${c.id}.jpg`),
+  crack_rate: cracks.map((c) => `crack${c.id}.txt`),
+  coordinates: cracks.map((c) => `crack${c.id}.txt`),
+  maintenance_history: cracks.map((c) => `crack${c.id}.txt`),
+};
 
 const getMarkerIcon = () => {
   return {
@@ -123,6 +41,7 @@ const getMarkerIcon = () => {
 
 function App() {
   const [selected, setSelected] = useState(null);
+  const [selectedFolder, setSelectedFolder] = useState(null);
 
   return (
     <LoadScript googleMapsApiKey="AIzaSyCChGpVfC1kWBxgsikIZiwfdMLR7iA5kPw">
@@ -162,6 +81,7 @@ function App() {
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
             fontSize: "13px",
             lineHeight: "1.6",
+            width: "230px",
           }}
         >
           <div><strong>데이터 기준</strong></div>
@@ -171,11 +91,41 @@ function App() {
           <hr style={{ margin: "8px 0" }} />
 
           <div><strong>최종 데이터 관리 구조</strong></div>
-          📁 before_repair<br />
-          📁 after_repair<br />
-          📁 crack_rate<br />
-          📁 coordinates<br />
-          📁 maintenance_history
+
+          {Object.keys(folderData).map((folder) => (
+            <div
+              key={folder}
+              onClick={() =>
+                setSelectedFolder(selectedFolder === folder ? null : folder)
+              }
+              style={{
+                cursor: "pointer",
+                color: selectedFolder === folder ? "#e74c3c" : "#2c3e50",
+                fontWeight: selectedFolder === folder ? "bold" : "normal",
+              }}
+            >
+              📁 {folder}
+            </div>
+          ))}
+
+          {selectedFolder && (
+            <div
+              style={{
+                marginTop: "8px",
+                padding: "8px",
+                backgroundColor: "#f5f5f5",
+                borderRadius: "8px",
+                maxHeight: "150px",
+                overflowY: "auto",
+              }}
+            >
+              <strong>{selectedFolder}</strong>
+              <br />
+              {folderData[selectedFolder].map((file) => (
+                <div key={file}>📄 {file}</div>
+              ))}
+            </div>
+          )}
         </div>
 
         {cracks.map((crack) => (
