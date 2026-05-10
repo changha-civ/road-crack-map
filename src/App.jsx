@@ -27,6 +27,43 @@ const folderData = {
   maintenance_history: cracks.map((c) => `crack${c.id}.txt`),
 };
 
+const getTextPreview = (folder, file) => {
+  const id = file.replace("crack", "").replace(".txt", "");
+  const crack = cracks.find((c) => String(c.id) === id);
+
+  if (folder === "crack_rate") {
+    return (
+      <>
+        균열률: {crack?.crackRate || "추가 예정"}
+      </>
+    );
+  }
+
+  if (folder === "coordinates") {
+    return (
+      <>
+        위도: {crack?.lat}
+        <br />
+        경도: {crack?.lng}
+      </>
+    );
+  }
+
+  if (folder === "maintenance_history") {
+    return (
+      <>
+        보수 여부: 미보수
+        <br />
+        촬영 날짜: 2026-04-10
+        <br />
+        보수 시뮬레이션: 2026-05-10
+      </>
+    );
+  }
+
+  return null;
+};
+
 const getMarkerIcon = () => {
   return {
     path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",
@@ -81,7 +118,7 @@ function App() {
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
             fontSize: "13px",
             lineHeight: "1.6",
-            width: "230px",
+            width: "250px",
           }}
         >
           <div><strong>데이터 기준</strong></div>
@@ -115,15 +152,62 @@ function App() {
                 padding: "8px",
                 backgroundColor: "#f5f5f5",
                 borderRadius: "8px",
-                maxHeight: "150px",
+                maxHeight: "260px",
                 overflowY: "auto",
               }}
             >
               <strong>{selectedFolder}</strong>
               <br />
-              {folderData[selectedFolder].map((file) => (
-                <div key={file}>📄 {file}</div>
-              ))}
+
+              {folderData[selectedFolder].map((file) => {
+                const isImageFolder =
+                  selectedFolder === "before_repair" ||
+                  selectedFolder === "after_repair";
+
+                const imagePath =
+                  selectedFolder === "before_repair"
+                    ? `/images/${file}`
+                    : selectedFolder === "after_repair"
+                    ? `/images/${file}`
+                    : null;
+
+                return (
+                  <div
+                    key={file}
+                    style={{
+                      marginTop: "8px",
+                      paddingBottom: "8px",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    <div>📄 {file}</div>
+
+                    {isImageFolder ? (
+                      <img
+                        src={imagePath}
+                        alt={file}
+                        style={{
+                          width: "100%",
+                          marginTop: "5px",
+                          borderRadius: "6px",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          marginTop: "5px",
+                          backgroundColor: "white",
+                          padding: "6px",
+                          borderRadius: "5px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        {getTextPreview(selectedFolder, file)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
