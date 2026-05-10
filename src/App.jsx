@@ -23,7 +23,7 @@ const cracks = [
     name: "균열 2",
     desc: "선형균열",
     imageBefore: "/images/crack2.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair2.jpg",
   },
   {
     id: 20,
@@ -32,7 +32,7 @@ const cracks = [
     name: "균열 20",
     desc: "선형균열",
     imageBefore: "/images/crack20.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair20.jpg",
   },
   {
     id: 40,
@@ -50,7 +50,7 @@ const cracks = [
     name: "균열 60",
     desc: "망상균열",
     imageBefore: "/images/crack60.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair60.jpg",
   },
   {
     id: 80,
@@ -68,7 +68,7 @@ const cracks = [
     name: "균열 110",
     desc: "망상균열",
     imageBefore: "/images/crack110.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair110.jpg",
   },
   {
     id: 130,
@@ -86,7 +86,7 @@ const cracks = [
     name: "균열 160",
     desc: "기타손상",
     imageBefore: "/images/crack160.jpg",
-    imageAfter: null,
+    imageAfter: "/images/repair160.jpg",
   },
   {
     id: 190,
@@ -197,29 +197,11 @@ function App() {
 
                 <div style={{ width: "50%" }}>
                   <p><strong>2026-05-10</strong></p>
-                  {selected.imageAfter ? (
-                    <img
-                      src={selected.imageAfter}
-                      alt="보수 시뮬레이션 이미지"
-                      style={{ width: "100%", borderRadius: "8px" }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        height: "150px",
-                        backgroundColor: "#f1f1f1",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "#777",
-                        borderRadius: "8px",
-                        textAlign: "center",
-                        padding: "10px",
-                      }}
-                    >
-                      보수 시뮬레이션 이미지<br />추후 추가 예정
-                    </div>
-                  )}
+                  <img
+                    src={selected.imageAfter}
+                    alt="보수 시뮬레이션 이미지"
+                    style={{ width: "100%", borderRadius: "8px" }}
+                  />
                 </div>
               </div>
             </div>
