@@ -13,6 +13,7 @@ const cracks = [
     lng: 127.18441,
     name: "균열 1",
     desc: "선형균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack1.jpg",
     imageAfter: "/images/repair1.jpg",
   },
@@ -22,6 +23,7 @@ const cracks = [
     lng: 127.184314,
     name: "균열 2",
     desc: "선형균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack2.jpg",
     imageAfter: "/images/repair2.jpg",
   },
@@ -31,6 +33,7 @@ const cracks = [
     lng: 127.184668,
     name: "균열 20",
     desc: "선형균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack20.jpg",
     imageAfter: "/images/repair20.jpg",
   },
@@ -40,6 +43,7 @@ const cracks = [
     lng: 127.18572,
     name: "균열 40",
     desc: "망상균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack40.jpg",
     imageAfter: "/images/repair40.jpg",
   },
@@ -49,6 +53,7 @@ const cracks = [
     lng: 127.18659,
     name: "균열 60",
     desc: "망상균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack60.jpg",
     imageAfter: "/images/repair60.jpg",
   },
@@ -58,6 +63,7 @@ const cracks = [
     lng: 127.1868,
     name: "균열 80",
     desc: "선형균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack80.jpg",
     imageAfter: "/images/repair80.jpg",
   },
@@ -67,6 +73,7 @@ const cracks = [
     lng: 127.187486,
     name: "균열 110",
     desc: "망상균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack110.jpg",
     imageAfter: "/images/repair110.jpg",
   },
@@ -76,6 +83,7 @@ const cracks = [
     lng: 127.18773,
     name: "균열 130",
     desc: "선형균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack130.jpg",
     imageAfter: "/images/repair130.jpg",
   },
@@ -85,6 +93,7 @@ const cracks = [
     lng: 127.187829,
     name: "균열 160",
     desc: "기타손상",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack160.jpg",
     imageAfter: "/images/repair160.jpg",
   },
@@ -94,6 +103,7 @@ const cracks = [
     lng: 127.18806,
     name: "균열 190",
     desc: "망상균열",
+    crackRate: "추가 예정",
     imageBefore: "/images/crack190.jpg",
     imageAfter: "/images/repair190.jpg",
   },
@@ -147,15 +157,25 @@ function App() {
             right: "12px",
             zIndex: 10,
             backgroundColor: "white",
-            padding: "10px",
+            padding: "12px",
             borderRadius: "10px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
             fontSize: "13px",
+            lineHeight: "1.6",
           }}
         >
           <div><strong>데이터 기준</strong></div>
           📷 2026-04-10 현장 촬영<br />
           🛠️ 2026-05-10 보수 시뮬레이션
+
+          <hr style={{ margin: "8px 0" }} />
+
+          <div><strong>최종 데이터 관리 구조</strong></div>
+          📁 before_repair<br />
+          📁 after_repair<br />
+          📁 crack_rate<br />
+          📁 coordinates<br />
+          📁 maintenance_history
         </div>
 
         {cracks.map((crack) => (
@@ -178,16 +198,20 @@ function App() {
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "400px" }}>
-              <h3>{selected.name}</h3>
+            <div style={{ width: "420px" }}>
+              <h3 style={{ marginTop: 0 }}>{selected.name}</h3>
 
               <p>
                 <strong>분류:</strong> {selected.desc}
               </p>
 
+              <p>
+                <strong>균열률:</strong> {selected.crackRate}
+              </p>
+
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ width: "50%" }}>
-                  <p><strong>2026-04-10</strong></p>
+                  <p><strong>보수 전</strong><br />2026-04-10</p>
                   <img
                     src={selected.imageBefore}
                     alt="현장 촬영 이미지"
@@ -196,7 +220,7 @@ function App() {
                 </div>
 
                 <div style={{ width: "50%" }}>
-                  <p><strong>2026-05-10</strong></p>
+                  <p><strong>보수 후</strong><br />2026-05-10</p>
                   <img
                     src={selected.imageAfter}
                     alt="보수 시뮬레이션 이미지"
