@@ -50,12 +50,11 @@ function App() {
   useEffect(() => {
     if (!selectedFolder) return;
 
-    const isTextFolder =
+    const isTextFileFolder =
       selectedFolder === "crack_rate" ||
-      selectedFolder === "coordinates" ||
       selectedFolder === "maintenance_history";
 
-    if (!isTextFolder) return;
+    if (!isTextFileFolder) return;
 
     folderData[selectedFolder].forEach((file) => {
       fetch(`/road-crack-data/${selectedFolder}/${file}`)
@@ -166,6 +165,8 @@ function App() {
                   : null;
 
                 const textKey = `${selectedFolder}/${file}`;
+                const crackId = file.replace("crack", "").replace(".txt", "");
+                const crack = cracks.find((c) => String(c.id) === crackId);
 
                 return (
                   <div
@@ -188,6 +189,21 @@ function App() {
                           borderRadius: "6px",
                         }}
                       />
+                    ) : selectedFolder === "coordinates" ? (
+                      <div
+                        style={{
+                          marginTop: "5px",
+                          backgroundColor: "white",
+                          padding: "6px",
+                          borderRadius: "5px",
+                          fontSize: "12px",
+                          whiteSpace: "pre-wrap",
+                        }}
+                      >
+                        위도: {crack?.lat}
+                        <br />
+                        경도: {crack?.lng}
+                      </div>
                     ) : (
                       <div
                         style={{
