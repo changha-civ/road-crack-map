@@ -50,6 +50,8 @@ const previewBoxStyle = {
   fontSize: "12px",
   whiteSpace: "pre-wrap",
   boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+  color: "#111",
+  fontWeight: "600",
 };
 
 const imageStyle = {
@@ -100,6 +102,7 @@ function App() {
         mapContainerStyle={{ width: "100%", height: "100vh" }}
         center={center}
         zoom={17}
+        mapTypeId="satellite"
       >
         <div
           style={{
@@ -133,19 +136,20 @@ function App() {
             fontSize: "13px",
             lineHeight: "1.6",
             width: "280px",
+            color: "#111",
           }}
         >
-          <div style={{ textAlign: "center", fontWeight: "bold", color: "#2c3e50" }}>
+          <div style={{ textAlign: "center", fontWeight: "bold", color: "#111" }}>
             데이터 기준
           </div>
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", fontWeight: "600" }}>
             📷 2026-04-10 현장 촬영<br />
             🛠️ 2026-05-10 보수 시뮬레이션
           </div>
 
           <hr style={{ margin: "8px 0" }} />
 
-          <div style={{ textAlign: "center", fontWeight: "bold", color: "#2c3e50" }}>
+          <div style={{ textAlign: "center", fontWeight: "bold", color: "#111" }}>
             최종 데이터 관리 구조
           </div>
 
@@ -157,8 +161,8 @@ function App() {
               }
               style={{
                 cursor: "pointer",
-                color: selectedFolder === folder ? "#e74c3c" : "#2c3e50",
-                fontWeight: selectedFolder === folder ? "bold" : "normal",
+                color: selectedFolder === folder ? "#e74c3c" : "#111",
+                fontWeight: selectedFolder === folder ? "bold" : "600",
                 padding: "2px 4px",
                 borderRadius: "5px",
                 backgroundColor: selectedFolder === folder ? "#fff0ec" : "transparent",
@@ -179,7 +183,7 @@ function App() {
                 overflowY: "auto",
               }}
             >
-              <strong style={{ color: "#2c3e50" }}>{selectedFolder}</strong>
+              <strong style={{ color: "#111" }}>{selectedFolder}</strong>
 
               {folderData[selectedFolder].map((file) => {
                 const isImageFolder =
@@ -203,7 +207,7 @@ function App() {
                       borderBottom: "1px solid #ddd",
                     }}
                   >
-                    <div style={{ fontWeight: "bold", color: "#555" }}>📄 {file}</div>
+                    <div style={{ fontWeight: "bold", color: "#111" }}>📄 {file}</div>
 
                     {isImageFolder ? (
                       <img src={imagePath} alt={file} style={imageStyle} />
@@ -245,7 +249,7 @@ function App() {
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
           >
-            <div style={{ width: "430px" }}>
+            <div style={{ width: "430px", color: "#111" }}>
               <h2
                 style={{
                   marginTop: 0,
@@ -254,14 +258,24 @@ function App() {
                   borderBottom: "2px solid #eee",
                   paddingBottom: "6px",
                   textAlign: "center",
+                  fontSize: "20px",
+                  fontWeight: "600",
                 }}
               >
                 {selected.name}
               </h2>
 
-              <p style={{ textAlign: "center", margin: "6px 0" }}>
-                <strong>분류:</strong> {selected.desc}
-              </p>
+              <div
+                style={{
+                  textAlign: "center",
+                  margin: "8px 0",
+                  fontSize: "17px",
+                  fontWeight: "bold",
+                  color: "#111",
+                }}
+              >
+                분류: {selected.desc}
+              </div>
 
               <div
                 style={{
@@ -271,12 +285,19 @@ function App() {
                   marginBottom: "10px",
                   textAlign: "center",
                   boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                  color: "#111",
                 }}
               >
-                <strong style={{ color: "#2c3e50" }}>균열률 분석</strong><br />
-                보수 전 균열률: {selected.beforeRate}%<br />
-                보수 후 균열률: {selected.afterRate}%<br />
-                <span style={{ color: "#27ae60", fontWeight: "bold" }}>
+                <strong style={{ color: "#111", fontSize: "16px" }}>균열률 분석</strong><br />
+                <span style={{ fontWeight: "bold", color: "#111" }}>
+                  보수 전 균열률: {selected.beforeRate}%
+                </span>
+                <br />
+                <span style={{ fontWeight: "bold", color: "#111" }}>
+                  보수 후 균열률: {selected.afterRate}%
+                </span>
+                <br />
+                <span style={{ color: "#27ae60", fontWeight: "bold", fontSize: "16px" }}>
                   감소율: {calcReduction(selected.beforeRate, selected.afterRate)}%
                 </span>
               </div>
