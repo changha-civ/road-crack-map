@@ -1,20 +1,17 @@
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const center = {
-  lat: 37.2205,
-  lng: 127.186,
-};
+const center = { lat: 37.2205, lng: 127.186 };
 
 const calcReduction = (before, after) => {
   if (!before || before === 0) return "0.0";
   return (((before - after) / before) * 100).toFixed(1);
 };
 
-const getRiskColor = (rate) => {
-  if (rate >= 40) return "#e74c3c";
-  if (rate >= 20) return "#f39c12";
-  return "#27ae60";
+const getRiskInfo = (rate) => {
+  if (rate >= 30) return { label: "위험", color: "#e74c3c" };
+  if (rate >= 10) return { label: "주의", color: "#f39c12" };
+  return { label: "양호", color: "#27ae60" };
 };
 
 const getMarkerColor = (type) => {
@@ -43,12 +40,70 @@ const imageStyle = {
   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
 };
 
+function CrackRateGraph({ history }) {
+  if (!history || history.length < 2) return null;
+
+  const width = 420;
+  const height = 130;
+  const padding = 28;
+  const maxRate = Math.max(...history.map((h) => Number(h.crack_rate || 0)), 40);
+
+  const points = history.map((item, index) => {
+    const x =
+      padding +
+      (index * (width - padding * 2)) / Math.max(history.length - 1, 1);
+    const y =
+      height -
+      padding -
+      (Number(item.crack_rate || 0) / maxRate) * (height - padding * 2);
+    return { x, y, item };
+  });
+
+  const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
+
+  return (
+    <div
+      style={{
+        marginBottom: "10px",
+        padding: "8px",
+        backgroundColor: "#fafafa",
+        borderRadius: "10px",
+        border: "1px solid #ddd",
+      }}
+    >
+      <div style={{ fontWeight: "800", fontSize: "13px", marginBottom: "4px" }}>
+        📈 날짜별 균열률 변화
+      </div>
+
+      <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
+        <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
+        <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
+
+        <polyline points={polyline} fill="none" stroke="#2c3e50" strokeWidth="3" />
+
+        {points.map((p, index) => (
+          <g key={index}>
+            <circle cx={p.x} cy={p.y} r="5" fill={getRiskInfo(p.item.crack_rate).color} />
+            <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="11" fontWeight="700">
+              {p.item.crack_rate}%
+            </text>
+            <text x={p.x} y={height - 8} textAnchor="middle" fontSize="10">
+              {p.item.date.slice(5)}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 function App() {
   const [cracks, setCracks] = useState([]);
   const [selected, setSelected] = useState(null);
   const [showDataStructure, setShowDataStructure] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const mapRef = useRef(null);
 
   useEffect(() => {
     fetch("/data/cracks.json")
@@ -61,9 +116,7 @@ function App() {
   }, []);
 
   const getSortedHistory = (location) =>
-    [...(location.history || [])].sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
+    [...(location.history || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const latestData = cracks.map((location) => {
     const history = getSortedHistory(location);
@@ -73,10 +126,8 @@ function App() {
   const averageRate =
     latestData.length > 0
       ? (
-          latestData.reduce(
-            (sum, item) => sum + Number(item?.crack_rate || 0),
-            0
-          ) / latestData.length
+          latestData.reduce((sum, item) => sum + Number(item?.crack_rate || 0), 0) /
+          latestData.length
         ).toFixed(1)
       : "0.0";
 
@@ -86,9 +137,16 @@ function App() {
     return acc;
   }, {});
 
+  const selectLocation = (location) => {
+    setSelected(location);
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat: location.lat, lng: location.lng });
+      mapRef.current.setZoom(19);
+    }
+  };
+
   const handleSearch = () => {
     const keyword = searchText.trim().toUpperCase();
-
     if (!keyword) return;
 
     const found = cracks.find(
@@ -97,16 +155,14 @@ function App() {
         location.location_name?.toUpperCase().includes(keyword)
     );
 
-    if (found) {
-      setSelected(found);
-    } else {
-      alert("해당 위치를 찾을 수 없습니다.");
-    }
+    if (found) selectLocation(found);
+    else alert("해당 위치를 찾을 수 없습니다.");
   };
 
   return (
     <LoadScript googleMapsApiKey="AIzaSyCChGpVfC1kWBxgsikIZiwfdMLR7iA5kPw">
       <GoogleMap
+        onLoad={(map) => (mapRef.current = map)}
         mapContainerStyle={{ width: "100%", height: "100vh" }}
         center={center}
         zoom={17}
@@ -174,20 +230,16 @@ function App() {
             <hr style={{ margin: "7px 0" }} />
 
             <div>
-              📍 위치 기준 관리
-              <br />
-              🗓️ 날짜별 이력 저장
-              <br />
-              📊 균열률 변화 추적
-              <br />
+              📍 위치 기준 관리<br />
+              🗓️ 날짜별 이력 저장<br />
+              📊 균열률 변화 추적<br />
               🛠️ 보수 전/후 비교 가능
             </div>
 
             <hr style={{ margin: "7px 0" }} />
 
             <div style={{ fontWeight: "bold" }}>
-              등록 위치 수: {cracks.length}개
-              <br />
+              등록 위치 수: {cracks.length}개<br />
               평균 최신 균열률: {averageRate}%
             </div>
 
@@ -199,8 +251,21 @@ function App() {
                 borderRadius: "8px",
               }}
             >
-              <strong>균열 종류 통계</strong>
+              <strong>위험도 기준</strong><br />
+              <span style={{ color: "#27ae60", fontWeight: "bold" }}>● 양호</span> 0~10%<br />
+              <span style={{ color: "#f39c12", fontWeight: "bold" }}>● 주의</span> 10~30%<br />
+              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>● 위험</span> 30% 이상
+            </div>
 
+            <div
+              style={{
+                marginTop: "7px",
+                padding: "7px",
+                backgroundColor: "#f7f7f7",
+                borderRadius: "8px",
+              }}
+            >
+              <strong>균열 종류 통계</strong>
               {Object.entries(typeCount).map(([type, count]) => (
                 <div key={type}>
                   {type}: {count}개
@@ -224,7 +289,6 @@ function App() {
                   fontSize: "12px",
                 }}
               />
-
               <button
                 onClick={handleSearch}
                 style={{
@@ -251,30 +315,10 @@ function App() {
                 fontSize: "11px",
               }}
             >
-              <strong>마커 범례</strong>
-              <br />
-              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span>{" "}
-              망상균열
-              <span
-                style={{
-                  color: "#f39c12",
-                  fontWeight: "bold",
-                  marginLeft: "8px",
-                }}
-              >
-                ●
-              </span>{" "}
-              선형균열
-              <span
-                style={{
-                  color: "#3498db",
-                  fontWeight: "bold",
-                  marginLeft: "8px",
-                }}
-              >
-                ●
-              </span>{" "}
-              기타손상
+              <strong>마커 범례</strong><br />
+              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열&nbsp;
+              <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열&nbsp;
+              <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
             </div>
 
             <button
@@ -309,7 +353,6 @@ function App() {
               >
                 {cracks.map((location) => {
                   const history = getSortedHistory(location);
-
                   return (
                     <div
                       key={location.location_id}
@@ -319,18 +362,11 @@ function App() {
                         borderBottom: "1px solid #ddd",
                       }}
                     >
-                      <strong>📍 {location.location_id}</strong>
-                      <br />
+                      <strong>📍 {location.location_id}</strong><br />
                       좌표: {location.lat}, {location.lng}
-                      <br />
-
                       {history.map((item, index) => (
-                        <div
-                          key={index}
-                          style={{ marginLeft: "6px", marginTop: "3px" }}
-                        >
-                          🗓️ {item.date}
-                          <br />└ {item.crack_type} / {item.crack_rate}%
+                        <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
+                          🗓️ {item.date}<br />└ {item.crack_type} / {item.crack_rate}%
                         </div>
                       ))}
                     </div>
@@ -340,8 +376,7 @@ function App() {
             )}
 
             <div style={{ marginTop: "6px", fontSize: "11px", color: "#333" }}>
-              ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에
-              자동 반영됩니다.
+              ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에 자동 반영됩니다.
             </div>
           </div>
         )}
@@ -356,7 +391,7 @@ function App() {
               key={location.location_id}
               position={{ lat: location.lat, lng: location.lng }}
               icon={getMarkerIcon(markerColor)}
-              onClick={() => setSelected(location)}
+              onClick={() => selectLocation(location)}
               label={{
                 text: location.location_id,
                 color: "white",
@@ -370,14 +405,11 @@ function App() {
         {selected &&
           (() => {
             const history = getSortedHistory(selected);
-
             const first = history[0];
             const latest = history[history.length - 1];
-
+            const risk = getRiskInfo(latest?.crack_rate);
             const reduction =
-              first && latest
-                ? calcReduction(first.crack_rate, latest.crack_rate)
-                : "0.0";
+              first && latest ? calcReduction(first.crack_rate, latest.crack_rate) : "0.0";
 
             return (
               <InfoWindow
@@ -410,50 +442,26 @@ function App() {
                       boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                     }}
                   >
-                    <div
-                      style={{
-                        fontSize: "19px",
-                        fontWeight: "800",
-                        color: "#2c3e50",
-                      }}
-                    >
+                    <div style={{ fontSize: "19px", fontWeight: "800", color: "#2c3e50" }}>
                       {latest?.date}
                     </div>
 
-                    <div
-                      style={{
-                        marginTop: "7px",
-                        fontSize: "14px",
-                        fontWeight: "700",
-                      }}
-                    >
+                    <div style={{ marginTop: "7px", fontSize: "14px", fontWeight: "700" }}>
                       균열 종류: {first?.crack_type}
                     </div>
 
-                    <div
-                      style={{
-                        marginTop: "4px",
-                        fontSize: "14px",
-                        fontWeight: "800",
-                        color: getRiskColor(latest?.crack_rate),
-                      }}
-                    >
-                      최신 균열률: {latest?.crack_rate}%
+                    <div style={{ marginTop: "4px", fontSize: "14px", fontWeight: "800", color: risk.color }}>
+                      최신 균열률: {latest?.crack_rate}% / 위험도: {risk.label}
                     </div>
 
                     {history.length >= 2 && (
-                      <div
-                        style={{
-                          marginTop: "4px",
-                          fontSize: "15px",
-                          fontWeight: "800",
-                          color: "#27ae60",
-                        }}
-                      >
+                      <div style={{ marginTop: "4px", fontSize: "15px", fontWeight: "800", color: "#27ae60" }}>
                         감소율: {reduction}%
                       </div>
                     )}
                   </div>
+
+                  <CrackRateGraph history={history} />
 
                   <div
                     style={{
@@ -464,65 +472,41 @@ function App() {
                       marginBottom: "8px",
                     }}
                   >
-                    {history.map((item, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          minWidth: "190px",
-                          textAlign: "center",
-                          border: "1px solid #ddd",
-                          borderRadius: "10px",
-                          padding: "7px",
-                          backgroundColor: "#fff",
-                        }}
-                      >
+                    {history.map((item, index) => {
+                      const itemRisk = getRiskInfo(item.crack_rate);
+
+                      return (
                         <div
+                          key={index}
                           style={{
-                            fontSize: "15px",
-                            fontWeight: "800",
-                            color: "#2c3e50",
+                            minWidth: "190px",
+                            textAlign: "center",
+                            border: `2px solid ${itemRisk.color}`,
+                            borderRadius: "10px",
+                            padding: "7px",
+                            backgroundColor: "#fff",
                           }}
                         >
-                          {item.date}
-                        </div>
+                          <div style={{ fontSize: "15px", fontWeight: "800", color: "#2c3e50" }}>
+                            {item.date}
+                          </div>
 
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: "700",
-                            marginTop: "3px",
-                          }}
-                        >
-                          {item.event}
-                        </div>
+                          <div style={{ fontSize: "12px", fontWeight: "700", marginTop: "3px" }}>
+                            {item.event}
+                          </div>
 
-                        <img
-                          src={item.image}
-                          alt={item.event}
-                          style={imageStyle}
-                        />
+                          <img src={item.image} alt={item.event} style={imageStyle} />
 
-                        <div
-                          style={{
-                            marginTop: "5px",
-                            fontSize: "12px",
-                            fontWeight: "700",
-                          }}
-                        >
-                          {item.crack_type}
-                        </div>
+                          <div style={{ marginTop: "5px", fontSize: "12px", fontWeight: "700" }}>
+                            {item.crack_type}
+                          </div>
 
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: "800",
-                            color: getRiskColor(item.crack_rate),
-                          }}
-                        >
-                          균열률: {item.crack_rate}%
+                          <div style={{ fontSize: "12px", fontWeight: "800", color: itemRisk.color }}>
+                            균열률: {item.crack_rate}% / {itemRisk.label}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div
@@ -546,11 +530,9 @@ function App() {
                           fontSize: "11px",
                         }}
                       >
-                        🗓️ {item.date} | {item.event}
-                        <br />
-                        균열 종류: {item.crack_type} / 균열률:{" "}
-                        {item.crack_rate}%
-                        <br />
+                        🗓️ {item.date} | {item.event}<br />
+                        균열 종류: {item.crack_type} / 균열률: {item.crack_rate}% / 위험도:{" "}
+                        {getRiskInfo(item.crack_rate).label}<br />
                         메모: {item.memo}
                       </div>
                     ))}
