@@ -73,23 +73,50 @@ function CrackRateGraph({ history }) {
   );
 }
 
-function TypeBarChart({ typeCount }) {
+function VerticalTypeBarChart({ typeCount }) {
   const entries = Object.entries(typeCount);
   if (entries.length === 0) return null;
 
   const max = Math.max(...entries.map(([, count]) => count), 1);
+  const width = 250;
+  const height = 150;
+  const padding = 28;
+  const barWidth = 38;
 
   return (
-    <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
-      <strong>📊 균열 종류 막대그래프</strong>
-      {entries.map(([type, count]) => (
-        <div key={type} style={{ marginTop: "6px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700" }}>{type}: {count}개</div>
-          <div style={{ height: "9px", backgroundColor: "#ddd", borderRadius: "6px", overflow: "hidden" }}>
-            <div style={{ width: `${(count / max) * 100}%`, height: "100%", backgroundColor: getMarkerColor(type) }} />
-          </div>
-        </div>
-      ))}
+    <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
+      <strong>📊 균열 종류 세로 막대그래프</strong>
+
+      <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
+        <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
+        <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
+
+        {entries.map(([type, count], index) => {
+          const gap = (width - padding * 2) / entries.length;
+          const x = padding + gap * index + gap / 2 - barWidth / 2;
+          const barHeight = (count / max) * (height - padding * 2);
+          const y = height - padding - barHeight;
+
+          return (
+            <g key={type}>
+              <rect
+                x={x}
+                y={y}
+                width={barWidth}
+                height={barHeight}
+                rx="5"
+                fill={getMarkerColor(type)}
+              />
+              <text x={x + barWidth / 2} y={y - 7} textAnchor="middle" fontSize="11" fontWeight="800">
+                {count}개
+              </text>
+              <text x={x + barWidth / 2} y={height - 8} textAnchor="middle" fontSize="10">
+                {type.replace("균열", "")}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
@@ -114,8 +141,8 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
   if (data.length < 2) return null;
 
   const width = 250;
-  const height = 110;
-  const padding = 24;
+  const height = 115;
+  const padding = 25;
   const maxRate = Math.max(...data.map((d) => d.avg), 40);
 
   const points = data.map((item, index) => {
@@ -125,17 +152,23 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
   });
 
   return (
-    <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
+    <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
       <strong>📈 전체 평균 균열률 변화</strong>
+
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
         <polyline points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#2c3e50" strokeWidth="3" />
+
         {points.map((p, index) => (
           <g key={index}>
             <circle cx={p.x} cy={p.y} r="4" fill={getRiskInfo(p.item.avg).color} />
-            <text x={p.x} y={p.y - 8} textAnchor="middle" fontSize="10" fontWeight="700">{p.item.avg.toFixed(1)}%</text>
-            <text x={p.x} y={height - 7} textAnchor="middle" fontSize="9">{p.item.date.slice(5)}</text>
+            <text x={p.x} y={p.y - 8} textAnchor="middle" fontSize="10" fontWeight="700">
+              {p.item.avg.toFixed(1)}%
+            </text>
+            <text x={p.x} y={height - 7} textAnchor="middle" fontSize="9">
+              {p.item.date.slice(5)}
+            </text>
           </g>
         ))}
       </svg>
@@ -148,6 +181,7 @@ function App() {
   const [selected, setSelected] = useState(null);
   const [showDataStructure, setShowDataStructure] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
+  const [showStatistics, setShowStatistics] = useState(false);
   const [searchText, setSearchText] = useState("");
   const mapRef = useRef(null);
 
@@ -239,8 +273,29 @@ function App() {
               평균 최신 균열률: {averageRate}%
             </div>
 
-            <TypeBarChart typeCount={typeCount} />
-            <AverageRateLineChart cracks={cracks} getSortedHistory={getSortedHistory} />
+            <button
+              onClick={() => setShowStatistics(!showStatistics)}
+              style={{
+                marginTop: "8px",
+                width: "100%",
+                padding: "7px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                backgroundColor: "#f7f7f7",
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: "12px",
+              }}
+            >
+              📊 전체 통계 {showStatistics ? "접기" : "보기"}
+            </button>
+
+            {showStatistics && (
+              <>
+                <VerticalTypeBarChart typeCount={typeCount} />
+                <AverageRateLineChart cracks={cracks} getSortedHistory={getSortedHistory} />
+              </>
+            )}
 
             <div style={{ marginTop: "7px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
               <strong>위험도 기준</strong><br />
