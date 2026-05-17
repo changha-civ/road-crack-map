@@ -20,6 +20,14 @@
         "crack_rate": 2,
         "image": "/images/repair1.jpg",
         "memo": "보수 후 균열률 감소"
+      },
+      {
+        "date": "2026-05-17",
+        "event": "재균열 발생",
+        "crack_type": "선형균열",
+        "crack_rate": 7,
+        "image": "/images/recrack1.jpg",
+        "memo": "부분 보수 후 재균열 발생"
       }
     ]
   },
@@ -92,6 +100,14 @@
         "crack_rate": 28,
         "image": "/images/repair40.jpg",
         "memo": "보수 후 균열률 감소"
+      },
+      {
+        "date": "2026-05-17",
+        "event": "재균열 발생",
+        "crack_type": "망상균열",
+        "crack_rate": 36,
+        "image": "/images/recrack40.jpg",
+        "memo": "부분 보수 후 재균열 발생"
       }
     ]
   },
@@ -139,102 +155,6 @@
         "crack_type": "선형균열",
         "crack_rate": 25,
         "image": "/images/repair80.jpg",
-        "memo": "보수 후 균열률 감소"
-      }
-    ]
-  },
-  {
-    "location_id": "A-110",
-    "location_name": "A-110 위치",
-    "lat": 37.2212,
-    "lng": 127.187486,
-    "history": [
-      {
-        "date": "2026-04-10",
-        "event": "보수 전",
-        "crack_type": "망상균열",
-        "crack_rate": 62,
-        "image": "/images/crack110.jpg",
-        "memo": "초기 현장 촬영 데이터"
-      },
-      {
-        "date": "2026-05-10",
-        "event": "보수 후",
-        "crack_type": "망상균열",
-        "crack_rate": 21,
-        "image": "/images/repair110.jpg",
-        "memo": "보수 후 균열률 감소"
-      }
-    ]
-  },
-  {
-    "location_id": "A-130",
-    "location_name": "A-130 위치",
-    "lat": 37.22124,
-    "lng": 127.18773,
-    "history": [
-      {
-        "date": "2026-04-10",
-        "event": "보수 전",
-        "crack_type": "선형균열",
-        "crack_rate": 32,
-        "image": "/images/crack130.jpg",
-        "memo": "초기 현장 촬영 데이터"
-      },
-      {
-        "date": "2026-05-10",
-        "event": "보수 후",
-        "crack_type": "선형균열",
-        "crack_rate": 9,
-        "image": "/images/repair130.jpg",
-        "memo": "보수 후 균열률 감소"
-      }
-    ]
-  },
-  {
-    "location_id": "A-160",
-    "location_name": "A-160 위치",
-    "lat": 37.221404,
-    "lng": 127.187829,
-    "history": [
-      {
-        "date": "2026-04-10",
-        "event": "보수 전",
-        "crack_type": "망상균열",
-        "crack_rate": 48,
-        "image": "/images/crack160.jpg",
-        "memo": "초기 현장 촬영 데이터"
-      },
-      {
-        "date": "2026-05-10",
-        "event": "보수 후",
-        "crack_type": "망상균열",
-        "crack_rate": 15,
-        "image": "/images/repair160.jpg",
-        "memo": "보수 후 균열률 감소"
-      }
-    ]
-  },
-  {
-    "location_id": "A-190",
-    "location_name": "A-190 위치",
-    "lat": 37.22146,
-    "lng": 127.18806,
-    "history": [
-      {
-        "date": "2026-04-10",
-        "event": "보수 전",
-        "crack_type": "망상균열",
-        "crack_rate": 54,
-        "image": "/images/crack190.jpg",
-        "memo": "초기 현장 촬영 데이터"
-      },
-      {
-        "date": "2026-05-10",
-        "event": "보수 후",
-        "crack_type": "망상균열",
-        "crack_rate": 23,
-        "image": "/images/repair190.jpg",
         "memo": "보수 후 균열률 감소"
       }
     ]
