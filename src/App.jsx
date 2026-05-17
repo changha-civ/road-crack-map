@@ -11,9 +11,22 @@ const calcReduction = (before, after) => {
   return (((before - after) / before) * 100).toFixed(1);
 };
 
-const getMarkerIcon = () => ({
+const getRiskColor = (rate) => {
+  if (rate >= 40) return "#e74c3c";
+  if (rate >= 20) return "#f39c12";
+  return "#27ae60";
+};
+
+const getMarkerColor = (type) => {
+  if (type?.includes("망상")) return "#e74c3c";
+  if (type?.includes("선형")) return "#f39c12";
+  if (type?.includes("기타")) return "#3498db";
+  return "#8e44ad";
+};
+
+const getMarkerIcon = (color) => ({
   path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",
-  fillColor: "#e74c3c",
+  fillColor: color,
   fillOpacity: 1,
   strokeColor: "white",
   strokeWeight: 2,
@@ -34,6 +47,8 @@ function App() {
   const [cracks, setCracks] = useState([]);
   const [selected, setSelected] = useState(null);
   const [showDataStructure, setShowDataStructure] = useState(false);
+  const [showPanel, setShowPanel] = useState(true);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     fetch("/data/cracks.json")
@@ -44,6 +59,45 @@ function App() {
       .then((data) => setCracks(data))
       .catch((err) => console.error("JSON 불러오기 실패:", err));
   }, []);
+
+  const getSortedHistory = (location) =>
+    [...(location.history || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const latestData = cracks.map((location) => {
+    const history = getSortedHistory(location);
+    return history[history.length - 1];
+  });
+
+  const averageRate =
+    latestData.length > 0
+      ? (
+          latestData.reduce((sum, item) => sum + Number(item?.crack_rate || 0), 0) /
+          latestData.length
+        ).toFixed(1)
+      : "0.0";
+
+  const typeCount = latestData.reduce((acc, item) => {
+    const type = item?.crack_type || "기타";
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
+
+  const handleSearch = () => {
+    const keyword = searchText.trim().toUpperCase();
+    if (!keyword) return;
+
+    const found = cracks.find(
+      (location) =>
+        location.location_id.toUpperCase().includes(keyword) ||
+        location.location_name?.toUpperCase().includes(keyword)
+    );
+
+    if (found) {
+      setSelected(found);
+    } else {
+      alert("해당 위치를 찾을 수 없습니다.");
+    }
+  };
 
   return (
     <LoadScript googleMapsApiKey="AIzaSyCChGpVfC1kWBxgsikIZiwfdMLR7iA5kPw">
@@ -56,7 +110,7 @@ function App() {
         <div
           style={{
             position: "absolute",
-            top: "20px",
+            top: "18px",
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 10,
@@ -72,129 +126,214 @@ function App() {
           🚧 도로 균열 유지관리 시스템
         </div>
 
-        <div
+        <button
+          onClick={() => setShowPanel(!showPanel)}
           style={{
             position: "absolute",
             top: "75px",
             right: "12px",
-            zIndex: 10,
-            backgroundColor: "white",
-            padding: "10px",
-            borderRadius: "12px",
-            boxShadow: "0 3px 10px rgba(0,0,0,0.25)",
-            fontSize: "12px",
-            lineHeight: "1.55",
-            width: "270px",
-            color: "#111",
+            zIndex: 11,
+            padding: "7px 12px",
+            borderRadius: "10px",
+            border: "none",
+            backgroundColor: "#2c3e50",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer",
           }}
         >
-          <div style={{ textAlign: "center", fontWeight: "bold" }}>
-            데이터 관리 방식
-          </div>
+          {showPanel ? "패널 접기" : "패널 보기"}
+        </button>
 
-          <hr style={{ margin: "7px 0" }} />
-
-          <div>
-            📍 위치 기준 관리<br />
-            🗓️ 날짜별 이력 저장<br />
-            📊 균열률 변화 추적<br />
-            🛠️ 보수 전/후 비교 가능
-          </div>
-
-          <hr style={{ margin: "7px 0" }} />
-
-          <div style={{ fontWeight: "bold" }}>
-            등록 위치 수: {cracks.length}개
-          </div>
-
-          <button
-            onClick={() => setShowDataStructure(!showDataStructure)}
+        {showPanel && (
+          <div
             style={{
-              marginTop: "8px",
-              width: "100%",
-              padding: "6px",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              backgroundColor: "#f7f7f7",
-              cursor: "pointer",
-              fontWeight: "bold",
+              position: "absolute",
+              top: "115px",
+              right: "12px",
+              zIndex: 10,
+              backgroundColor: "white",
+              padding: "10px",
+              borderRadius: "12px",
+              boxShadow: "0 3px 10px rgba(0,0,0,0.25)",
               fontSize: "12px",
+              lineHeight: "1.55",
+              width: "280px",
+              color: "#111",
             }}
           >
-            📁 종합 데이터 구조 {showDataStructure ? "접기" : "보기"}
-          </button>
+            <div style={{ textAlign: "center", fontWeight: "bold" }}>데이터 관리 방식</div>
 
-          {showDataStructure && (
+            <hr style={{ margin: "7px 0" }} />
+
+            <div>
+              📍 위치 기준 관리<br />
+              🗓️ 날짜별 이력 저장<br />
+              📊 균열률 변화 추적<br />
+              🛠️ 보수 전/후 비교 가능
+            </div>
+
+            <hr style={{ margin: "7px 0" }} />
+
+            <div style={{ fontWeight: "bold" }}>
+              등록 위치 수: {cracks.length}개
+              <br />
+              평균 최신 균열률: {averageRate}%
+            </div>
+
+            <div
+              style={{
+                marginTop: "7px",
+                padding: "7px",
+                backgroundColor: "#f7f7f7",
+                borderRadius: "8px",
+              }}
+            >
+              <strong>균열 종류 통계</strong>
+              {Object.entries(typeCount).map(([type, count]) => (
+                <div key={type}>
+                  {type}: {count}개
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: "5px", marginTop: "8px" }}>
+              <input
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+                placeholder="예: A-40"
+                style={{
+                  flex: 1,
+                  padding: "6px",
+                  border: "1px solid #ddd",
+                  borderRadius: "7px",
+                  fontSize: "12px",
+                }}
+              />
+              <button
+                onClick={handleSearch}
+                style={{
+                  padding: "6px 9px",
+                  border: "none",
+                  borderRadius: "7px",
+                  backgroundColor: "#2c3e50",
+                  color: "white",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                }}
+              >
+                검색
+              </button>
+            </div>
+
             <div
               style={{
                 marginTop: "8px",
-                maxHeight: "180px",
-                overflowY: "auto",
-                backgroundColor: "#f8f8f8",
-                padding: "8px",
+                padding: "7px",
+                backgroundColor: "#fafafa",
                 borderRadius: "8px",
                 fontSize: "11px",
-                lineHeight: "1.5",
               }}
             >
-              {cracks.map((location) => {
-                const history = [...(location.history || [])].sort(
-                  (a, b) => new Date(a.date) - new Date(b.date)
-                );
-
-                return (
-                  <div
-                    key={location.location_id}
-                    style={{
-                      marginBottom: "8px",
-                      paddingBottom: "6px",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                  >
-                    <strong>📍 {location.location_id}</strong>
-                    <br />
-                    좌표: {location.lat}, {location.lng}
-                    <br />
-
-                    {history.map((item, index) => (
-                      <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
-                        🗓️ {item.date}
-                        <br />
-                        └ {item.crack_type} / {item.crack_rate}%
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
+              <strong>마커 범례</strong>
+              <br />
+              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열&nbsp;
+              <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열&nbsp;
+              <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
             </div>
-          )}
 
-          <div style={{ marginTop: "6px", fontSize: "11px", color: "#333" }}>
-            ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에 자동 반영됩니다.
+            <button
+              onClick={() => setShowDataStructure(!showDataStructure)}
+              style={{
+                marginTop: "8px",
+                width: "100%",
+                padding: "6px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                backgroundColor: "#f7f7f7",
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: "12px",
+              }}
+            >
+              📁 종합 데이터 구조 {showDataStructure ? "접기" : "보기"}
+            </button>
+
+            {showDataStructure && (
+              <div
+                style={{
+                  marginTop: "8px",
+                  maxHeight: "180px",
+                  overflowY: "auto",
+                  backgroundColor: "#f8f8f8",
+                  padding: "8px",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  lineHeight: "1.5",
+                }}
+              >
+                {cracks.map((location) => {
+                  const history = getSortedHistory(location);
+
+                  return (
+                    <div
+                      key={location.location_id}
+                      style={{
+                        marginBottom: "8px",
+                        paddingBottom: "6px",
+                        borderBottom: "1px solid #ddd",
+                      }}
+                    >
+                      <strong>📍 {location.location_id}</strong>
+                      <br />
+                      좌표: {location.lat}, {location.lng}
+                      <br />
+                      {history.map((item, index) => (
+                        <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
+                          🗓️ {item.date}
+                          <br />└ {item.crack_type} / {item.crack_rate}%
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div style={{ marginTop: "6px", fontSize: "11px", color: "#333" }}>
+              ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에 자동 반영됩니다.
+            </div>
           </div>
-        </div>
+        )}
 
-        {cracks.map((location) => (
-          <Marker
-            key={location.location_id}
-            position={{ lat: location.lat, lng: location.lng }}
-            icon={getMarkerIcon()}
-            onClick={() => setSelected(location)}
-            label={{
-              text: location.location_id.replace("A-", ""),
-              color: "white",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}
-          />
-        ))}
+        {cracks.map((location) => {
+          const history = getSortedHistory(location);
+          const first = history[0];
+          const markerColor = getMarkerColor(first?.crack_type);
+
+          return (
+            <Marker
+              key={location.location_id}
+              position={{ lat: location.lat, lng: location.lng }}
+              icon={getMarkerIcon(markerColor)}
+              onClick={() => setSelected(location)}
+              label={{
+                text: location.location_id.replace("A-", ""),
+                color: "white",
+                fontSize: "12px",
+                fontWeight: "bold",
+              }}
+            />
+          );
+        })}
 
         {selected &&
           (() => {
-            const history = [...(selected.history || [])].sort(
-              (a, b) => new Date(a.date) - new Date(b.date)
-            );
-
+            const history = getSortedHistory(selected);
             const first = history[0];
             const latest = history[history.length - 1];
 
@@ -248,7 +387,14 @@ function App() {
                       균열 종류: {first?.crack_type}
                     </div>
 
-                    <div style={{ marginTop: "4px", fontSize: "14px", fontWeight: "700" }}>
+                    <div
+                      style={{
+                        marginTop: "4px",
+                        fontSize: "14px",
+                        fontWeight: "800",
+                        color: getRiskColor(latest?.crack_rate),
+                      }}
+                    >
                       최신 균열률: {latest?.crack_rate}%
                     </div>
 
@@ -307,7 +453,13 @@ function App() {
                           {item.crack_type}
                         </div>
 
-                        <div style={{ fontSize: "12px", fontWeight: "700" }}>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            color: getRiskColor(item.crack_rate),
+                          }}
+                        >
                           균열률: {item.crack_rate}%
                         </div>
                       </div>
