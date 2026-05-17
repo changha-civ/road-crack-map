@@ -1,7 +1,7 @@
 [
   {
     "location_id": "A-01",
-    "location_name": "균열 1 위치",
+    "location_name": "A-01 위치",
     "lat": 37.21913,
     "lng": 127.18441,
     "history": [
@@ -16,7 +16,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "선형균열",
         "crack_rate": 2,
         "image": "/images/repair1.jpg",
         "memo": "보수 후 균열률 감소"
@@ -25,7 +25,7 @@
   },
   {
     "location_id": "A-02",
-    "location_name": "균열 2 위치",
+    "location_name": "A-02 위치",
     "lat": 37.218956,
     "lng": 127.184314,
     "history": [
@@ -40,7 +40,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "선형균열",
         "crack_rate": 0,
         "image": "/images/repair2.jpg",
         "memo": "보수 후 균열률 감소"
@@ -49,7 +49,7 @@
   },
   {
     "location_id": "A-20",
-    "location_name": "균열 20 위치",
+    "location_name": "A-20 위치",
     "lat": 37.219648,
     "lng": 127.184668,
     "history": [
@@ -64,7 +64,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "선형균열",
         "crack_rate": 5,
         "image": "/images/repair20.jpg",
         "memo": "보수 후 균열률 감소"
@@ -73,7 +73,7 @@
   },
   {
     "location_id": "A-40",
-    "location_name": "균열 40 위치",
+    "location_name": "A-40 위치",
     "lat": 37.22007,
     "lng": 127.18572,
     "history": [
@@ -88,7 +88,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "망상균열",
         "crack_rate": 28,
         "image": "/images/repair40.jpg",
         "memo": "보수 후 균열률 감소"
@@ -97,7 +97,7 @@
   },
   {
     "location_id": "A-60",
-    "location_name": "균열 60 위치",
+    "location_name": "A-60 위치",
     "lat": 37.220271,
     "lng": 127.18659,
     "history": [
@@ -112,7 +112,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "망상균열",
         "crack_rate": 16,
         "image": "/images/repair60.jpg",
         "memo": "보수 후 균열률 감소"
@@ -121,7 +121,7 @@
   },
   {
     "location_id": "A-80",
-    "location_name": "균열 80 위치",
+    "location_name": "A-80 위치",
     "lat": 37.22067,
     "lng": 127.1868,
     "history": [
@@ -136,7 +136,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "선형균열",
         "crack_rate": 25,
         "image": "/images/repair80.jpg",
         "memo": "보수 후 균열률 감소"
@@ -145,7 +145,7 @@
   },
   {
     "location_id": "A-110",
-    "location_name": "균열 110 위치",
+    "location_name": "A-110 위치",
     "lat": 37.2212,
     "lng": 127.187486,
     "history": [
@@ -160,7 +160,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "망상균열",
         "crack_rate": 21,
         "image": "/images/repair110.jpg",
         "memo": "보수 후 균열률 감소"
@@ -169,7 +169,7 @@
   },
   {
     "location_id": "A-130",
-    "location_name": "균열 130 위치",
+    "location_name": "A-130 위치",
     "lat": 37.22124,
     "lng": 127.18773,
     "history": [
@@ -184,7 +184,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "선형균열",
         "crack_rate": 9,
         "image": "/images/repair130.jpg",
         "memo": "보수 후 균열률 감소"
@@ -193,14 +193,14 @@
   },
   {
     "location_id": "A-160",
-    "location_name": "균열 160 위치",
+    "location_name": "A-160 위치",
     "lat": 37.221404,
     "lng": 127.187829,
     "history": [
       {
         "date": "2026-04-10",
         "event": "보수 전",
-        "crack_type": "기타손상",
+        "crack_type": "망상균열",
         "crack_rate": 48,
         "image": "/images/crack160.jpg",
         "memo": "초기 현장 촬영 데이터"
@@ -208,7 +208,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "망상균열",
         "crack_rate": 15,
         "image": "/images/repair160.jpg",
         "memo": "보수 후 균열률 감소"
@@ -217,7 +217,7 @@
   },
   {
     "location_id": "A-190",
-    "location_name": "균열 190 위치",
+    "location_name": "A-190 위치",
     "lat": 37.22146,
     "lng": 127.18806,
     "history": [
@@ -232,7 +232,7 @@
       {
         "date": "2026-05-10",
         "event": "보수 후",
-        "crack_type": "보수 후 상태",
+        "crack_type": "망상균열",
         "crack_rate": 23,
         "image": "/images/repair190.jpg",
         "memo": "보수 후 균열률 감소"
