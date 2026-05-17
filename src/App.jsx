@@ -61,7 +61,9 @@ function App() {
   }, []);
 
   const getSortedHistory = (location) =>
-    [...(location.history || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+    [...(location.history || [])].sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
 
   const latestData = cracks.map((location) => {
     const history = getSortedHistory(location);
@@ -71,8 +73,10 @@ function App() {
   const averageRate =
     latestData.length > 0
       ? (
-          latestData.reduce((sum, item) => sum + Number(item?.crack_rate || 0), 0) /
-          latestData.length
+          latestData.reduce(
+            (sum, item) => sum + Number(item?.crack_rate || 0),
+            0
+          ) / latestData.length
         ).toFixed(1)
       : "0.0";
 
@@ -84,6 +88,7 @@ function App() {
 
   const handleSearch = () => {
     const keyword = searchText.trim().toUpperCase();
+
     if (!keyword) return;
 
     const found = cracks.find(
@@ -162,14 +167,19 @@ function App() {
               color: "#111",
             }}
           >
-            <div style={{ textAlign: "center", fontWeight: "bold" }}>데이터 관리 방식</div>
+            <div style={{ textAlign: "center", fontWeight: "bold" }}>
+              데이터 관리 방식
+            </div>
 
             <hr style={{ margin: "7px 0" }} />
 
             <div>
-              📍 위치 기준 관리<br />
-              🗓️ 날짜별 이력 저장<br />
-              📊 균열률 변화 추적<br />
+              📍 위치 기준 관리
+              <br />
+              🗓️ 날짜별 이력 저장
+              <br />
+              📊 균열률 변화 추적
+              <br />
               🛠️ 보수 전/후 비교 가능
             </div>
 
@@ -190,6 +200,7 @@ function App() {
               }}
             >
               <strong>균열 종류 통계</strong>
+
               {Object.entries(typeCount).map(([type, count]) => (
                 <div key={type}>
                   {type}: {count}개
@@ -213,6 +224,7 @@ function App() {
                   fontSize: "12px",
                 }}
               />
+
               <button
                 onClick={handleSearch}
                 style={{
@@ -241,9 +253,28 @@ function App() {
             >
               <strong>마커 범례</strong>
               <br />
-              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열&nbsp;
-              <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열&nbsp;
-              <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
+              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span>{" "}
+              망상균열
+              <span
+                style={{
+                  color: "#f39c12",
+                  fontWeight: "bold",
+                  marginLeft: "8px",
+                }}
+              >
+                ●
+              </span>{" "}
+              선형균열
+              <span
+                style={{
+                  color: "#3498db",
+                  fontWeight: "bold",
+                  marginLeft: "8px",
+                }}
+              >
+                ●
+              </span>{" "}
+              기타손상
             </div>
 
             <button
@@ -292,8 +323,12 @@ function App() {
                       <br />
                       좌표: {location.lat}, {location.lng}
                       <br />
+
                       {history.map((item, index) => (
-                        <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
+                        <div
+                          key={index}
+                          style={{ marginLeft: "6px", marginTop: "3px" }}
+                        >
                           🗓️ {item.date}
                           <br />└ {item.crack_type} / {item.crack_rate}%
                         </div>
@@ -305,7 +340,8 @@ function App() {
             )}
 
             <div style={{ marginTop: "6px", fontSize: "11px", color: "#333" }}>
-              ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에 자동 반영됩니다.
+              ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에
+              자동 반영됩니다.
             </div>
           </div>
         )}
@@ -322,9 +358,9 @@ function App() {
               icon={getMarkerIcon(markerColor)}
               onClick={() => setSelected(location)}
               label={{
-                text: location.location_id.replace("A-", ""),
+                text: location.location_id,
                 color: "white",
-                fontSize: "12px",
+                fontSize: "10px",
                 fontWeight: "bold",
               }}
             />
@@ -334,6 +370,7 @@ function App() {
         {selected &&
           (() => {
             const history = getSortedHistory(selected);
+
             const first = history[0];
             const latest = history[history.length - 1];
 
@@ -383,7 +420,13 @@ function App() {
                       {latest?.date}
                     </div>
 
-                    <div style={{ marginTop: "7px", fontSize: "14px", fontWeight: "700" }}>
+                    <div
+                      style={{
+                        marginTop: "7px",
+                        fontSize: "14px",
+                        fontWeight: "700",
+                      }}
+                    >
                       균열 종류: {first?.crack_type}
                     </div>
 
@@ -443,13 +486,29 @@ function App() {
                           {item.date}
                         </div>
 
-                        <div style={{ fontSize: "12px", fontWeight: "700", marginTop: "3px" }}>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            marginTop: "3px",
+                          }}
+                        >
                           {item.event}
                         </div>
 
-                        <img src={item.image} alt={item.event} style={imageStyle} />
+                        <img
+                          src={item.image}
+                          alt={item.event}
+                          style={imageStyle}
+                        />
 
-                        <div style={{ marginTop: "5px", fontSize: "12px", fontWeight: "700" }}>
+                        <div
+                          style={{
+                            marginTop: "5px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                          }}
+                        >
                           {item.crack_type}
                         </div>
 
@@ -489,7 +548,8 @@ function App() {
                       >
                         🗓️ {item.date} | {item.event}
                         <br />
-                        균열 종류: {item.crack_type} / 균열률: {item.crack_rate}%
+                        균열 종류: {item.crack_type} / 균열률:{" "}
+                        {item.crack_rate}%
                         <br />
                         메모: {item.memo}
                       </div>
