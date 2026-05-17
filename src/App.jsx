@@ -9,9 +9,9 @@ const calcReduction = (before, after) => {
 };
 
 const getRiskInfo = (rate) => {
-  if (rate >= 30) return { label: "위험", color: "#e74c3c" };
-  if (rate >= 10) return { label: "주의", color: "#f39c12" };
-  return { label: "양호", color: "#27ae60" };
+  if (rate >= 30) return { label: "위험", icon: "🚨", color: "#e74c3c" };
+  if (rate >= 10) return { label: "주의", icon: "⚠️", color: "#f39c12" };
+  return { label: "양호", icon: "🟢", color: "#27ae60" };
 };
 
 const getMarkerColor = (type) => {
@@ -99,14 +99,7 @@ function VerticalTypeBarChart({ typeCount }) {
 
           return (
             <g key={type}>
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                rx="5"
-                fill={getMarkerColor(type)}
-              />
+              <rect x={x} y={y} width={barWidth} height={barHeight} rx="5" fill={getMarkerColor(type)} />
               <text x={x + barWidth / 2} y={y - 7} textAnchor="middle" fontSize="11" fontWeight="800">
                 {count}개
               </text>
@@ -273,20 +266,7 @@ function App() {
               평균 최신 균열률: {averageRate}%
             </div>
 
-            <button
-              onClick={() => setShowStatistics(!showStatistics)}
-              style={{
-                marginTop: "8px",
-                width: "100%",
-                padding: "7px",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                backgroundColor: "#f7f7f7",
-                cursor: "pointer",
-                fontWeight: "bold",
-                fontSize: "12px",
-              }}
-            >
+            <button onClick={() => setShowStatistics(!showStatistics)} style={{ marginTop: "8px", width: "100%", padding: "7px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#f7f7f7", cursor: "pointer", fontWeight: "bold", fontSize: "12px" }}>
               📊 전체 통계 {showStatistics ? "접기" : "보기"}
             </button>
 
@@ -299,9 +279,9 @@ function App() {
 
             <div style={{ marginTop: "7px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
               <strong>위험도 기준</strong><br />
-              <span style={{ color: "#27ae60", fontWeight: "bold" }}>● 양호</span> 0~10%<br />
-              <span style={{ color: "#f39c12", fontWeight: "bold" }}>● 주의</span> 10~30%<br />
-              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>● 위험</span> 30% 이상
+              🟢 양호 0~10%<br />
+              ⚠️ 주의 10~30%<br />
+              🚨 위험 30% 이상
             </div>
 
             <div style={{ display: "flex", gap: "5px", marginTop: "8px" }}>
@@ -380,7 +360,7 @@ function App() {
                     <div style={{ fontSize: "19px", fontWeight: "800", color: "#2c3e50" }}>{latest?.date}</div>
                     <div style={{ marginTop: "7px", fontSize: "14px", fontWeight: "700" }}>균열 종류: {first?.crack_type}</div>
                     <div style={{ marginTop: "4px", fontSize: "14px", fontWeight: "800", color: risk.color }}>
-                      최신 균열률: {latest?.crack_rate}% / 위험도: {risk.label}
+                      최신 균열률: {latest?.crack_rate}% / 위험도: {risk.icon} {risk.label}
                     </div>
                     {history.length >= 2 && (
                       <div style={{ marginTop: "4px", fontSize: "15px", fontWeight: "800", color: "#27ae60" }}>
@@ -395,13 +375,13 @@ function App() {
                     {history.map((item, index) => {
                       const itemRisk = getRiskInfo(item.crack_rate);
                       return (
-                        <div key={index} style={{ minWidth: "190px", textAlign: "center", border: `2px solid ${itemRisk.color}`, borderRadius: "10px", padding: "7px", backgroundColor: "#fff" }}>
+                        <div key={index} style={{ minWidth: "190px", textAlign: "center", border: "2px solid #ddd", borderRadius: "10px", padding: "7px", backgroundColor: "#fff" }}>
                           <div style={{ fontSize: "15px", fontWeight: "800", color: "#2c3e50" }}>{item.date}</div>
                           <div style={{ fontSize: "12px", fontWeight: "700", marginTop: "3px" }}>{item.event}</div>
                           <img src={item.image} alt={item.event} style={imageStyle} />
                           <div style={{ marginTop: "5px", fontSize: "12px", fontWeight: "700" }}>{item.crack_type}</div>
                           <div style={{ fontSize: "12px", fontWeight: "800", color: itemRisk.color }}>
-                            균열률: {item.crack_rate}% / {itemRisk.label}
+                            균열률: {item.crack_rate}% / {itemRisk.icon} {itemRisk.label}
                           </div>
                         </div>
                       );
@@ -410,13 +390,16 @@ function App() {
 
                   <div style={{ maxHeight: "115px", overflowY: "auto", borderTop: "1px solid #ddd", paddingTop: "7px" }}>
                     <strong>날짜별 유지관리 이력</strong>
-                    {history.map((item, index) => (
-                      <div key={index} style={{ marginTop: "5px", padding: "6px", backgroundColor: "#f7f7f7", borderRadius: "7px", fontSize: "11px" }}>
-                        🗓️ {item.date} | {item.event}<br />
-                        균열 종류: {item.crack_type} / 균열률: {item.crack_rate}% / 위험도: {getRiskInfo(item.crack_rate).label}<br />
-                        메모: {item.memo}
-                      </div>
-                    ))}
+                    {history.map((item, index) => {
+                      const itemRisk = getRiskInfo(item.crack_rate);
+                      return (
+                        <div key={index} style={{ marginTop: "5px", padding: "6px", backgroundColor: "#f7f7f7", borderRadius: "7px", fontSize: "11px" }}>
+                          🗓️ {item.date} | {item.event}<br />
+                          균열 종류: {item.crack_type} / 균열률: {item.crack_rate}% / 위험도: {itemRisk.icon} {itemRisk.label}<br />
+                          메모: {item.memo}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </InfoWindow>
