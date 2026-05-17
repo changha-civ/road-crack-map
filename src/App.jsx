@@ -371,18 +371,26 @@ function App() {
 
                   <CrackRateGraph history={history} />
 
-                  <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "8px", marginBottom: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "stretch", gap: "8px", overflowX: "auto", paddingBottom: "8px", marginBottom: "8px" }}>
                     {history.map((item, index) => {
                       const itemRisk = getRiskInfo(item.crack_rate);
                       return (
-                        <div key={index} style={{ minWidth: "190px", textAlign: "center", border: "2px solid #ddd", borderRadius: "10px", padding: "7px", backgroundColor: "#fff" }}>
-                          <div style={{ fontSize: "15px", fontWeight: "800", color: "#2c3e50" }}>{item.date}</div>
-                          <div style={{ fontSize: "12px", fontWeight: "700", marginTop: "3px" }}>{item.event}</div>
-                          <img src={item.image} alt={item.event} style={imageStyle} />
-                          <div style={{ marginTop: "5px", fontSize: "12px", fontWeight: "700" }}>{item.crack_type}</div>
-                          <div style={{ fontSize: "12px", fontWeight: "800", color: itemRisk.color }}>
-                            균열률: {item.crack_rate}% / {itemRisk.icon} {itemRisk.label}
+                        <div key={index} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <div style={{ minWidth: "190px", textAlign: "center", border: "2px solid #ddd", borderRadius: "10px", padding: "7px", backgroundColor: "#fff" }}>
+                            <div style={{ fontSize: "15px", fontWeight: "800", color: "#2c3e50" }}>{item.date}</div>
+                            <div style={{ fontSize: "12px", fontWeight: "700", marginTop: "3px" }}>{item.event}</div>
+                            <img src={item.image} alt={item.event} style={imageStyle} />
+                            <div style={{ marginTop: "5px", fontSize: "12px", fontWeight: "700" }}>{item.crack_type}</div>
+                            <div style={{ fontSize: "12px", fontWeight: "800", color: itemRisk.color }}>
+                              균열률: {item.crack_rate}% / {itemRisk.icon} {itemRisk.label}
+                            </div>
                           </div>
+
+                          {index < history.length - 1 && (
+                            <div style={{ fontSize: "24px", fontWeight: "900", color: "#2c3e50", display: "flex", alignItems: "center" }}>
+                              →
+                            </div>
+                          )}
                         </div>
                       );
                     })}
