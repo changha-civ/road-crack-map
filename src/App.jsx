@@ -7,29 +7,8 @@ const center = {
 };
 
 const calcReduction = (before, after) => {
-  if (before === 0) return "0.0";
+  if (!before || before === 0) return "0.0";
   return (((before - after) / before) * 100).toFixed(1);
-};
-
-const cracks = [
-  { id: 1, lat: 37.21913, lng: 127.18441, name: "균열 1", desc: "선형균열", beforeRate: 12, afterRate: 2, imageBefore: "/images/crack1.jpg", imageAfter: "/images/repair1.jpg" },
-  { id: 2, lat: 37.218956, lng: 127.184314, name: "균열 2", desc: "선형균열", beforeRate: 10, afterRate: 0, imageBefore: "/images/crack2.jpg", imageAfter: "/images/repair2.jpg" },
-  { id: 20, lat: 37.219648, lng: 127.184668, name: "균열 20", desc: "선형균열", beforeRate: 26, afterRate: 5, imageBefore: "/images/crack20.jpg", imageAfter: "/images/repair20.jpg" },
-  { id: 40, lat: 37.22007, lng: 127.18572, name: "균열 40", desc: "망상균열", beforeRate: 61, afterRate: 28, imageBefore: "/images/crack40.jpg", imageAfter: "/images/repair40.jpg" },
-  { id: 60, lat: 37.220271, lng: 127.18659, name: "균열 60", desc: "망상균열", beforeRate: 44, afterRate: 16, imageBefore: "/images/crack60.jpg", imageAfter: "/images/repair60.jpg" },
-  { id: 80, lat: 37.22067, lng: 127.1868, name: "균열 80", desc: "선형균열", beforeRate: 42, afterRate: 25, imageBefore: "/images/crack80.jpg", imageAfter: "/images/repair80.jpg" },
-  { id: 110, lat: 37.2212, lng: 127.187486, name: "균열 110", desc: "망상균열", beforeRate: 62, afterRate: 21, imageBefore: "/images/crack110.jpg", imageAfter: "/images/repair110.jpg" },
-  { id: 130, lat: 37.22124, lng: 127.18773, name: "균열 130", desc: "선형균열", beforeRate: 32, afterRate: 9, imageBefore: "/images/crack130.jpg", imageAfter: "/images/repair130.jpg" },
-  { id: 160, lat: 37.221404, lng: 127.187829, name: "균열 160", desc: "기타손상", beforeRate: 48, afterRate: 15, imageBefore: "/images/crack160.jpg", imageAfter: "/images/repair160.jpg" },
-  { id: 190, lat: 37.22146, lng: 127.18806, name: "균열 190", desc: "망상균열", beforeRate: 54, afterRate: 23, imageBefore: "/images/crack190.jpg", imageAfter: "/images/repair190.jpg" },
-];
-
-const folderData = {
-  before_repair: cracks.map((c) => `crack${c.id}.jpg`),
-  after_repair: cracks.map((c) => `repair${c.id}.jpg`),
-  crack_rate: cracks.map((c) => `crack${c.id}.txt`),
-  coordinates: cracks.map((c) => `crack${c.id}.txt`),
-  maintenance_history: cracks.map((c) => `crack${c.id}.txt`),
 };
 
 const getMarkerIcon = () => ({
@@ -42,18 +21,6 @@ const getMarkerIcon = () => ({
   labelOrigin: { x: 12, y: 9 },
 });
 
-const previewBoxStyle = {
-  marginTop: "5px",
-  backgroundColor: "white",
-  padding: "7px",
-  borderRadius: "7px",
-  fontSize: "12px",
-  whiteSpace: "pre-wrap",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-  color: "#111",
-  fontWeight: "600",
-};
-
 const imageStyle = {
   width: "100%",
   marginTop: "5px",
@@ -62,39 +29,18 @@ const imageStyle = {
 };
 
 function App() {
+  const [cracks, setCracks] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [selectedFolder, setSelectedFolder] = useState(null);
-  const [textContents, setTextContents] = useState({});
 
   useEffect(() => {
-    if (!selectedFolder) return;
-
-    const isTextFileFolder =
-      selectedFolder === "crack_rate" ||
-      selectedFolder === "maintenance_history";
-
-    if (!isTextFileFolder) return;
-
-    folderData[selectedFolder].forEach((file) => {
-      fetch(`/road-crack-data/${selectedFolder}/${file}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("파일 없음");
-          return res.text();
-        })
-        .then((text) => {
-          setTextContents((prev) => ({
-            ...prev,
-            [`${selectedFolder}/${file}`]: text,
-          }));
-        })
-        .catch(() => {
-          setTextContents((prev) => ({
-            ...prev,
-            [`${selectedFolder}/${file}`]: "파일 내용을 불러올 수 없습니다.",
-          }));
-        });
-    });
-  }, [selectedFolder]);
+    fetch("/data/cracks.json")
+      .then((res) => {
+        if (!res.ok) throw new Error("cracks.json 파일을 불러올 수 없습니다.");
+        return res.json();
+      })
+      .then((data) => setCracks(data))
+      .catch((err) => console.error("JSON 불러오기 실패:", err));
+  }, []);
 
   return (
     <LoadScript googleMapsApiKey="AIzaSyCChGpVfC1kWBxgsikIZiwfdMLR7iA5kPw">
@@ -120,7 +66,7 @@ function App() {
             boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
           }}
         >
-          🚧 도로 균열 관리 시스템
+          🚧 도로 균열 유지관리 시스템
         </div>
 
         <div
@@ -135,195 +81,163 @@ function App() {
             boxShadow: "0 3px 10px rgba(0,0,0,0.25)",
             fontSize: "13px",
             lineHeight: "1.6",
-            width: "280px",
+            width: "290px",
             color: "#111",
           }}
         >
-          <div style={{ textAlign: "center", fontWeight: "bold", color: "#111" }}>
-            데이터 기준
-          </div>
-          <div style={{ textAlign: "center", fontWeight: "600" }}>
-            📷 2026-04-10 현장 촬영<br />
-            🛠️ 2026-05-10 보수 시뮬레이션
+          <div style={{ textAlign: "center", fontWeight: "bold" }}>
+            데이터 관리 방식
           </div>
 
           <hr style={{ margin: "8px 0" }} />
 
-          <div style={{ textAlign: "center", fontWeight: "bold", color: "#111" }}>
-            최종 데이터 관리 구조
+          <div>
+            📍 위치 기준 관리<br />
+            🗓️ 날짜별 이력 저장<br />
+            📊 균열률 변화 추적<br />
+            🛠️ 보수 전/후 비교 가능
           </div>
 
-          {Object.keys(folderData).map((folder) => (
-            <div
-              key={folder}
-              onClick={() =>
-                setSelectedFolder(selectedFolder === folder ? null : folder)
-              }
-              style={{
-                cursor: "pointer",
-                color: selectedFolder === folder ? "#e74c3c" : "#111",
-                fontWeight: selectedFolder === folder ? "bold" : "600",
-                padding: "2px 4px",
-                borderRadius: "5px",
-                backgroundColor: selectedFolder === folder ? "#fff0ec" : "transparent",
-              }}
-            >
-              📁 {folder}
-            </div>
-          ))}
+          <hr style={{ margin: "8px 0" }} />
 
-          {selectedFolder && (
-            <div
-              style={{
-                marginTop: "8px",
-                padding: "8px",
-                backgroundColor: "#f5f5f5",
-                borderRadius: "8px",
-                maxHeight: "250px",
-                overflowY: "auto",
-              }}
-            >
-              <strong style={{ color: "#111" }}>{selectedFolder}</strong>
+          <div style={{ fontWeight: "bold" }}>
+            등록 위치 수: {cracks.length}개
+          </div>
 
-              {folderData[selectedFolder].map((file) => {
-                const isImageFolder =
-                  selectedFolder === "before_repair" ||
-                  selectedFolder === "after_repair";
-
-                const imagePath = isImageFolder
-                  ? `/road-crack-data/${selectedFolder}/${file}`
-                  : null;
-
-                const textKey = `${selectedFolder}/${file}`;
-                const crackId = file.replace("crack", "").replace(".txt", "");
-                const crack = cracks.find((c) => String(c.id) === crackId);
-
-                return (
-                  <div
-                    key={file}
-                    style={{
-                      marginTop: "8px",
-                      paddingBottom: "8px",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                  >
-                    <div style={{ fontWeight: "bold", color: "#111" }}>📄 {file}</div>
-
-                    {isImageFolder ? (
-                      <img src={imagePath} alt={file} style={imageStyle} />
-                    ) : selectedFolder === "coordinates" ? (
-                      <div style={previewBoxStyle}>
-                        위도: {crack?.lat}
-                        <br />
-                        경도: {crack?.lng}
-                      </div>
-                    ) : (
-                      <div style={previewBoxStyle}>
-                        {textContents[textKey] || "불러오는 중..."}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          <div style={{ marginTop: "6px", fontSize: "12px", color: "#333" }}>
+            ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에 자동 반영됩니다.
+          </div>
         </div>
 
-        {cracks.map((crack) => (
+        {cracks.map((location) => (
           <Marker
-            key={crack.id}
-            position={{ lat: crack.lat, lng: crack.lng }}
+            key={location.location_id}
+            position={{ lat: location.lat, lng: location.lng }}
             icon={getMarkerIcon()}
-            onClick={() => setSelected(crack)}
+            onClick={() => setSelected(location)}
             label={{
-              text: String(crack.id),
+              text: location.location_id,
               color: "white",
-              fontSize: "13px",
+              fontSize: "11px",
               fontWeight: "bold",
             }}
           />
         ))}
 
-        {selected && (
-          <InfoWindow
-            position={{ lat: selected.lat, lng: selected.lng }}
-            onCloseClick={() => setSelected(null)}
-          >
-            <div style={{ width: "430px", color: "#111" }}>
-              <h2
-                style={{
-                  marginTop: 0,
-                  marginBottom: "8px",
-                  color: "#2c3e50",
-                  borderBottom: "2px solid #eee",
-                  paddingBottom: "6px",
-                  textAlign: "center",
-                  fontSize: "20px",
-                  fontWeight: "600",
-                }}
-              >
-                {selected.name}
-              </h2>
+        {selected && (() => {
+          const history = selected.history || [];
+          const first = history[0];
+          const latest = history[history.length - 1];
 
-              <div
-                style={{
-                  textAlign: "center",
-                  margin: "8px 0",
-                  fontSize: "17px",
-                  fontWeight: "bold",
-                  color: "#111",
-                }}
-              >
-                분류: {selected.desc}
-              </div>
+          return (
+            <InfoWindow
+              position={{ lat: selected.lat, lng: selected.lng }}
+              onCloseClick={() => setSelected(null)}
+            >
+              <div style={{ width: "460px", color: "#111" }}>
+                <h2
+                  style={{
+                    marginTop: 0,
+                    marginBottom: "8px",
+                    color: "#2c3e50",
+                    borderBottom: "2px solid #eee",
+                    paddingBottom: "6px",
+                    textAlign: "center",
+                    fontSize: "20px",
+                    fontWeight: "700",
+                  }}
+                >
+                  {selected.location_id} | {selected.location_name}
+                </h2>
 
-              <div
-                style={{
-                  backgroundColor: "#f5f5f5",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  marginBottom: "10px",
-                  textAlign: "center",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-                  color: "#111",
-                }}
-              >
-                <strong style={{ color: "#111", fontSize: "16px" }}>균열률 분석</strong><br />
-                <span style={{ fontWeight: "bold", color: "#111" }}>
-                  보수 전 균열률: {selected.beforeRate}%
-                </span>
-                <br />
-                <span style={{ fontWeight: "bold", color: "#111" }}>
-                  보수 후 균열률: {selected.afterRate}%
-                </span>
-                <br />
-                <span style={{ color: "#27ae60", fontWeight: "bold", fontSize: "16px" }}>
-                  감소율: {calcReduction(selected.beforeRate, selected.afterRate)}%
-                </span>
-              </div>
-
-              <div style={{ display: "flex", gap: "8px" }}>
-                <div style={{ width: "50%", textAlign: "center" }}>
-                  <p><strong>보수 전</strong><br />2026-04-10</p>
-                  <img
-                    src={selected.imageBefore}
-                    alt="현장 촬영 이미지"
-                    style={imageStyle}
-                  />
+                <div
+                  style={{
+                    backgroundColor: "#f5f5f5",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    marginBottom: "10px",
+                    textAlign: "center",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <strong style={{ fontSize: "16px" }}>최신 상태</strong>
+                  <br />
+                  날짜: {latest?.date}
+                  <br />
+                  이벤트: {latest?.event}
+                  <br />
+                  균열 종류: {latest?.crack_type}
+                  <br />
+                  균열률: {latest?.crack_rate}%
                 </div>
 
-                <div style={{ width: "50%", textAlign: "center" }}>
-                  <p><strong>보수 후</strong><br />2026-05-10</p>
-                  <img
-                    src={selected.imageAfter}
-                    alt="보수 시뮬레이션 이미지"
-                    style={imageStyle}
-                  />
+                {first && latest && history.length >= 2 && (
+                  <div
+                    style={{
+                      backgroundColor: "#ecf9f1",
+                      padding: "10px",
+                      borderRadius: "10px",
+                      marginBottom: "10px",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    보수 전 균열률: {first.crack_rate}%<br />
+                    보수 후 균열률: {latest.crack_rate}%<br />
+                    <span style={{ color: "#27ae60", fontSize: "16px" }}>
+                      감소율: {calcReduction(first.crack_rate, latest.crack_rate)}%
+                    </span>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+                  {history.map((item, index) => (
+                    <div key={index} style={{ width: `${100 / history.length}%`, textAlign: "center" }}>
+                      <p style={{ margin: "4px 0", fontWeight: "bold" }}>
+                        {item.event}
+                        <br />
+                        {item.date}
+                      </p>
+                      <img src={item.image} alt={item.event} style={imageStyle} />
+                      <div style={{ marginTop: "4px", fontSize: "12px", fontWeight: "600" }}>
+                        {item.crack_type} / {item.crack_rate}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div
+                  style={{
+                    maxHeight: "150px",
+                    overflowY: "auto",
+                    borderTop: "1px solid #ddd",
+                    paddingTop: "8px",
+                  }}
+                >
+                  <strong>날짜별 유지관리 이력</strong>
+                  {history.map((item, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        marginTop: "6px",
+                        padding: "7px",
+                        backgroundColor: "#f7f7f7",
+                        borderRadius: "7px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      🗓️ {item.date} | {item.event}
+                      <br />
+                      분류: {item.crack_type} / 균열률: {item.crack_rate}%
+                      <br />
+                      메모: {item.memo}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          </InfoWindow>
-        )}
+            </InfoWindow>
+          );
+        })()}
       </GoogleMap>
     </LoadScript>
   );
