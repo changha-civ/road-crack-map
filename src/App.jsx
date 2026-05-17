@@ -23,7 +23,9 @@ const getMarkerIcon = () => ({
 
 const imageStyle = {
   width: "100%",
-  marginTop: "5px",
+  height: "230px",
+  objectFit: "cover",
+  marginTop: "6px",
   borderRadius: "8px",
   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
 };
@@ -116,25 +118,30 @@ function App() {
             icon={getMarkerIcon()}
             onClick={() => setSelected(location)}
             label={{
-              text: location.location_id,
+              text: location.location_id.replace("A-", ""),
               color: "white",
-              fontSize: "11px",
+              fontSize: "12px",
               fontWeight: "bold",
             }}
           />
         ))}
 
         {selected && (() => {
-          const history = selected.history || [];
+          const history = [...(selected.history || [])].sort(
+            (a, b) => new Date(a.date) - new Date(b.date)
+          );
+
           const first = history[0];
           const latest = history[history.length - 1];
+          const reduction =
+            first && latest ? calcReduction(first.crack_rate, latest.crack_rate) : "0.0";
 
           return (
             <InfoWindow
               position={{ lat: selected.lat, lng: selected.lng }}
               onCloseClick={() => setSelected(null)}
             >
-              <div style={{ width: "460px", color: "#111" }}>
+              <div style={{ width: "520px", color: "#111" }}>
                 <h2
                   style={{
                     marginTop: 0,
@@ -143,64 +150,79 @@ function App() {
                     borderBottom: "2px solid #eee",
                     paddingBottom: "6px",
                     textAlign: "center",
-                    fontSize: "20px",
-                    fontWeight: "700",
+                    fontSize: "22px",
+                    fontWeight: "800",
                   }}
                 >
-                  {selected.location_id} | {selected.location_name}
+                  {selected.location_id}
                 </h2>
 
                 <div
                   style={{
                     backgroundColor: "#f5f5f5",
-                    padding: "10px",
+                    padding: "12px",
                     borderRadius: "10px",
                     marginBottom: "10px",
                     textAlign: "center",
                     boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                   }}
                 >
-                  <strong style={{ fontSize: "16px" }}>최신 상태</strong>
-                  <br />
-                  날짜: {latest?.date}
-                  <br />
-                  이벤트: {latest?.event}
-                  <br />
-                  균열 종류: {latest?.crack_type}
-                  <br />
-                  균열률: {latest?.crack_rate}%
+                  <div style={{ fontSize: "20px", fontWeight: "800", color: "#2c3e50" }}>
+                    {latest?.date}
+                  </div>
+
+                  <div style={{ marginTop: "8px", fontSize: "15px", fontWeight: "700" }}>
+                    균열 종류: {first?.crack_type}
+                  </div>
+
+                  <div style={{ marginTop: "4px", fontSize: "15px", fontWeight: "700" }}>
+                    최신 균열률: {latest?.crack_rate}%
+                  </div>
+
+                  {history.length >= 2 && (
+                    <div style={{ marginTop: "4px", fontSize: "16px", fontWeight: "800", color: "#27ae60" }}>
+                      감소율: {reduction}%
+                    </div>
+                  )}
                 </div>
 
-                {first && latest && history.length >= 2 && (
-                  <div
-                    style={{
-                      backgroundColor: "#ecf9f1",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      marginBottom: "10px",
-                      textAlign: "center",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    보수 전 균열률: {first.crack_rate}%<br />
-                    보수 후 균열률: {latest.crack_rate}%<br />
-                    <span style={{ color: "#27ae60", fontSize: "16px" }}>
-                      감소율: {calcReduction(first.crack_rate, latest.crack_rate)}%
-                    </span>
-                  </div>
-                )}
-
-                <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    overflowX: "auto",
+                    paddingBottom: "8px",
+                    marginBottom: "10px",
+                  }}
+                >
                   {history.map((item, index) => (
-                    <div key={index} style={{ width: `${100 / history.length}%`, textAlign: "center" }}>
-                      <p style={{ margin: "4px 0", fontWeight: "bold" }}>
-                        {item.event}
-                        <br />
+                    <div
+                      key={index}
+                      style={{
+                        minWidth: "230px",
+                        textAlign: "center",
+                        border: "1px solid #ddd",
+                        borderRadius: "10px",
+                        padding: "8px",
+                        backgroundColor: "#fff",
+                      }}
+                    >
+                      <div style={{ fontSize: "16px", fontWeight: "800", color: "#2c3e50" }}>
                         {item.date}
-                      </p>
+                      </div>
+
+                      <div style={{ fontSize: "13px", fontWeight: "700", marginTop: "3px" }}>
+                        {item.event}
+                      </div>
+
                       <img src={item.image} alt={item.event} style={imageStyle} />
-                      <div style={{ marginTop: "4px", fontSize: "12px", fontWeight: "600" }}>
-                        {item.crack_type} / {item.crack_rate}%
+
+                      <div style={{ marginTop: "6px", fontSize: "13px", fontWeight: "700" }}>
+                        {item.crack_type}
+                      </div>
+
+                      <div style={{ fontSize: "13px", fontWeight: "700" }}>
+                        균열률: {item.crack_rate}%
                       </div>
                     </div>
                   ))}
@@ -208,13 +230,14 @@ function App() {
 
                 <div
                   style={{
-                    maxHeight: "150px",
+                    maxHeight: "140px",
                     overflowY: "auto",
                     borderTop: "1px solid #ddd",
                     paddingTop: "8px",
                   }}
                 >
                   <strong>날짜별 유지관리 이력</strong>
+
                   {history.map((item, index) => (
                     <div
                       key={index}
@@ -228,7 +251,7 @@ function App() {
                     >
                       🗓️ {item.date} | {item.event}
                       <br />
-                      분류: {item.crack_type} / 균열률: {item.crack_rate}%
+                      균열 종류: {item.crack_type} / 균열률: {item.crack_rate}%
                       <br />
                       메모: {item.memo}
                     </div>
