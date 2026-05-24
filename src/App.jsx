@@ -180,7 +180,10 @@ function App() {
   const [showStats, setShowStats] = useState(false);
   const [showStructure, setShowStructure] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [bouncingId, setBouncingId] = useState(null);
+
   const mapRef = useRef(null);
+  const bounceTimerRef = useRef(null);
 
   useEffect(() => {
     fetch(CSV_URL)
@@ -242,6 +245,16 @@ function App() {
 
   const selectLocation = (location) => {
     setSelected(location);
+    setBouncingId(location.location_id);
+
+    if (bounceTimerRef.current) {
+      clearTimeout(bounceTimerRef.current);
+    }
+
+    bounceTimerRef.current = setTimeout(() => {
+      setBouncingId(null);
+    }, 1400);
+
     if (mapRef.current) {
       mapRef.current.panTo({ lat: location.lat, lng: location.lng });
       mapRef.current.setZoom(19);
@@ -295,12 +308,12 @@ function App() {
               <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
             </div>
 
-            <div style={{ position: "absolute", bottom: "25px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "320px", maxHeight: showStructure ? "38vh" : "48px", overflowY: "auto", fontSize: "11px", lineHeight: "1.5", color: "#111" }}>
+            <div style={{ position: "absolute", bottom: "25px", left: "12px", zIndex: 10, backgroundColor: "white", padding: showStructure ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "320px", maxHeight: showStructure ? "38vh" : "36px", overflowY: "auto", fontSize: "11px", lineHeight: "1.5", color: "#111" }}>
               <div
                 onClick={() => setShowStructure(!showStructure)}
-                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer" }}
+                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}
               >
-                📁 종합 데이터 구조 {showStructure ? "▲" : "▼"}
+                📁 종합 데이터 구조 <span style={{ fontSize: "15px", fontWeight: "900" }}>{showStructure ? "▲" : "▼"}</span>
               </div>
 
               {showStructure && (
@@ -343,20 +356,20 @@ function App() {
                   onChange={(e) => setSearchText(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   placeholder="예: A-01"
-                  style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }}
+                  style={{ flex: 1, height: "26px", padding: "4px 6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px", boxSizing: "border-box" }}
                 />
-                <button onClick={handleSearch} style={{ padding: "6px 9px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>
+                <button onClick={handleSearch} style={{ height: "26px", padding: "3px 8px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>
                   검색
                 </button>
               </div>
             </div>
 
-            <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "285px", maxHeight: showStats ? "47vh" : "48px", overflowY: "auto", fontSize: "12px", color: "#111" }}>
+            <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: showStats ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "285px", maxHeight: showStats ? "47vh" : "36px", overflowY: "auto", fontSize: "12px", color: "#111" }}>
               <div
                 onClick={() => setShowStats(!showStats)}
-                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer" }}
+                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}
               >
-                📊 전체 통계 및 그래프 {showStats ? "▲" : "▼"}
+                📊 전체 통계 및 그래프 <span style={{ fontSize: "15px", fontWeight: "900" }}>{showStats ? "▲" : "▼"}</span>
               </div>
 
               {showStats && (
@@ -377,12 +390,18 @@ function App() {
           const history = getSortedHistory(location);
           const first = history[0];
           const markerColor = getMarkerColor(first?.crack_type);
+          const isBouncing = bouncingId === location.location_id;
 
           return (
             <Marker
               key={location.location_id}
               position={{ lat: location.lat, lng: location.lng }}
               icon={getMarkerIcon(markerColor)}
+              animation={
+                isBouncing && window.google
+                  ? window.google.maps.Animation.BOUNCE
+                  : undefined
+              }
               onClick={() => selectLocation(location)}
               label={{ text: location.location_id, color: "white", fontSize: "10px", fontWeight: "bold" }}
             />
