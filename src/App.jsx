@@ -1,6 +1,8 @@
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 
+const CSV_URL = "https://docs.google.com/spreadsheets/d/1FlwEk0RewgYCFvmgU7qctDJwqDjS6eNP3hekUx5qlm4/export?format=csv";
+
 const center = { lat: 37.2205, lng: 127.186 };
 
 const calcReduction = (before, after) => {
@@ -40,6 +42,20 @@ const imageStyle = {
   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
 };
 
+const parseCSV = (text) => {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = lines[0].split(",").map((h) => h.trim());
+
+  return lines.slice(1).map((line) => {
+    const values = line.split(",").map((v) => v.trim());
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] || "";
+    });
+    return row;
+  });
+};
+
 function CrackRateGraph({ history }) {
   if (!history || history.length < 2) return null;
 
@@ -65,7 +81,7 @@ function CrackRateGraph({ history }) {
           <g key={index}>
             <circle cx={p.x} cy={p.y} r="5" fill={getRiskInfo(p.item.crack_rate).color} />
             <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="11" fontWeight="700">{p.item.crack_rate}%</text>
-            <text x={p.x} y={height - 8} textAnchor="middle" fontSize="10">{p.item.date.slice(5)}</text>
+            <text x={p.x} y={height - 8} textAnchor="middle" fontSize="10">{p.item.date?.slice(5)}</text>
           </g>
         ))}
       </svg>
@@ -86,7 +102,6 @@ function VerticalTypeBarChart({ typeCount }) {
   return (
     <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
       <strong>📊 균열 종류 세로 막대그래프</strong>
-
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
@@ -147,7 +162,6 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
   return (
     <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
       <strong>📈 전체 평균 균열률 변화</strong>
-
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
@@ -179,13 +193,42 @@ function App() {
   const mapRef = useRef(null);
 
   useEffect(() => {
-    fetch("/data/cracks.json")
+    fetch(CSV_URL)
       .then((res) => {
-        if (!res.ok) throw new Error("cracks.json 파일을 불러올 수 없습니다.");
-        return res.json();
+        if (!res.ok) throw new Error("구글시트 데이터를 불러올 수 없습니다.");
+        return res.text();
       })
-      .then((data) => setCracks(data))
-      .catch((err) => console.error("JSON 불러오기 실패:", err));
+      .then((csvText) => {
+        const rows = parseCSV(csvText);
+        const grouped = {};
+
+        rows.forEach((row) => {
+          if (!row.location_id) return;
+
+          if (!grouped[row.location_id]) {
+            grouped[row.location_id] = {
+              location_id: row.location_id,
+              section: row.section,
+              location_name: `${row.section}구간 ${row.location_id}`,
+              lat: Number(row.lat),
+              lng: Number(row.lng),
+              history: [],
+            };
+          }
+
+          grouped[row.location_id].history.push({
+            date: row.date,
+            event: row.event || "조사 데이터",
+            crack_type: row.crack_type,
+            crack_rate: Number(row.crack_rate),
+            image: row.image_url,
+            memo: row.memo || "구글시트 연동 데이터",
+          });
+        });
+
+        setCracks(Object.values(grouped));
+      })
+      .catch((err) => console.error("구글시트 불러오기 실패:", err));
   }, []);
 
   const getSortedHistory = (location) =>
@@ -285,7 +328,7 @@ function App() {
             </div>
 
             <div style={{ display: "flex", gap: "5px", marginTop: "8px" }}>
-              <input value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="예: A-40" style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }} />
+              <input value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="예: A-1" style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }} />
               <button onClick={handleSearch} style={{ padding: "6px 9px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>검색</button>
             </div>
 
@@ -307,6 +350,7 @@ function App() {
                   return (
                     <div key={location.location_id} style={{ marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #ddd" }}>
                       <strong>📍 {location.location_id}</strong><br />
+                      구간: {location.section}<br />
                       좌표: {location.lat}, {location.lng}
                       {history.map((item, index) => (
                         <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
@@ -320,7 +364,7 @@ function App() {
             )}
 
             <div style={{ marginTop: "6px", fontSize: "11px", color: "#333" }}>
-              ※ public/data/cracks.json 파일에 데이터를 추가하면 지도에 자동 반영됩니다.
+              ※ Google Sheets에 데이터를 추가하면 웹사이트 새로고침 시 자동 반영됩니다.
             </div>
           </div>
         )}
