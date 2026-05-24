@@ -56,6 +56,18 @@ const parseCSV = (text) => {
   });
 };
 
+const accordionButtonStyle = {
+  marginTop: "8px",
+  width: "100%",
+  padding: "7px",
+  border: "1px solid #ddd",
+  borderRadius: "8px",
+  backgroundColor: "#f7f7f7",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "12px",
+};
+
 function CrackRateGraph({ history }) {
   if (!history || history.length < 2) return null;
 
@@ -186,9 +198,14 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
 function App() {
   const [cracks, setCracks] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [showDataStructure, setShowDataStructure] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
+
+  const [showManagement, setShowManagement] = useState(true);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [showRiskGuide, setShowRiskGuide] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
+  const [showDataStructure, setShowDataStructure] = useState(false);
+
   const [searchText, setSearchText] = useState("");
   const mapRef = useRef(null);
 
@@ -291,25 +308,26 @@ function App() {
 
         {showPanel && (
           <div style={{ position: "absolute", top: "115px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", fontSize: "12px", lineHeight: "1.55", width: "280px", color: "#111", maxHeight: "78vh", overflowY: "auto" }}>
-            <div style={{ textAlign: "center", fontWeight: "bold" }}>데이터 관리 방식</div>
+            <button onClick={() => setShowManagement(!showManagement)} style={{ ...accordionButtonStyle, marginTop: 0 }}>
+              📂 데이터 관리 방식 {showManagement ? "접기" : "보기"}
+            </button>
 
-            <hr style={{ margin: "7px 0" }} />
+            {showManagement && (
+              <div style={{ marginTop: "7px", padding: "7px", backgroundColor: "#fafafa", borderRadius: "8px" }}>
+                📍 위치 기준 관리<br />
+                🗓️ 날짜별 이력 저장<br />
+                📊 균열률 변화 추적<br />
+                🛠️ 보수 전/후 비교 가능<br />
+                🧾 Google Sheets 기반 자동 반영
+              </div>
+            )}
 
-            <div>
-              📍 위치 기준 관리<br />
-              🗓️ 날짜별 이력 저장<br />
-              📊 균열률 변화 추적<br />
-              🛠️ 보수 전/후 비교 가능
-            </div>
-
-            <hr style={{ margin: "7px 0" }} />
-
-            <div style={{ fontWeight: "bold" }}>
+            <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px", fontWeight: "bold" }}>
               등록 위치 수: {cracks.length}개<br />
               평균 최신 균열률: {averageRate}%
             </div>
 
-            <button onClick={() => setShowStatistics(!showStatistics)} style={{ marginTop: "8px", width: "100%", padding: "7px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#f7f7f7", cursor: "pointer", fontWeight: "bold", fontSize: "12px" }}>
+            <button onClick={() => setShowStatistics(!showStatistics)} style={accordionButtonStyle}>
               📊 전체 통계 {showStatistics ? "접기" : "보기"}
             </button>
 
@@ -320,26 +338,36 @@ function App() {
               </>
             )}
 
-            <div style={{ marginTop: "7px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
-              <strong>위험도 기준</strong><br />
-              🟢 양호 0~10%<br />
-              ⚠️ 주의 10~30%<br />
-              🚨 위험 30% 이상
-            </div>
+            <button onClick={() => setShowRiskGuide(!showRiskGuide)} style={accordionButtonStyle}>
+              ⚠️ 위험도 기준 {showRiskGuide ? "접기" : "보기"}
+            </button>
+
+            {showRiskGuide && (
+              <div style={{ marginTop: "7px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px", lineHeight: "1.6" }}>
+                🟢 양호 0~10%<br />
+                ⚠️ 주의 10~30%<br />
+                🚨 위험 30% 이상
+              </div>
+            )}
 
             <div style={{ display: "flex", gap: "5px", marginTop: "8px" }}>
-              <input value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="예: A-1" style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }} />
+              <input value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="예: A-01" style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }} />
               <button onClick={handleSearch} style={{ padding: "6px 9px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>검색</button>
             </div>
 
-            <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#fafafa", borderRadius: "8px", fontSize: "11px" }}>
-              <strong>마커 범례</strong><br />
-              <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열&nbsp;
-              <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열&nbsp;
-              <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
-            </div>
+            <button onClick={() => setShowLegend(!showLegend)} style={accordionButtonStyle}>
+              📍 마커 범례 {showLegend ? "접기" : "보기"}
+            </button>
 
-            <button onClick={() => setShowDataStructure(!showDataStructure)} style={{ marginTop: "8px", width: "100%", padding: "6px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#f7f7f7", cursor: "pointer", fontWeight: "bold", fontSize: "12px" }}>
+            {showLegend && (
+              <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#fafafa", borderRadius: "8px", fontSize: "11px", lineHeight: "1.6" }}>
+                <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열&nbsp;
+                <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열&nbsp;
+                <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
+              </div>
+            )}
+
+            <button onClick={() => setShowDataStructure(!showDataStructure)} style={accordionButtonStyle}>
               📁 종합 데이터 구조 {showDataStructure ? "접기" : "보기"}
             </button>
 
@@ -354,7 +382,7 @@ function App() {
                       좌표: {location.lat}, {location.lng}
                       {history.map((item, index) => (
                         <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
-                          🗓️ {item.date}<br />└ {item.crack_type} / {item.crack_rate}%
+                          🗓️ {item.date}<br />└ {item.event} / {item.crack_type} / {item.crack_rate}%
                         </div>
                       ))}
                     </div>
