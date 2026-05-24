@@ -247,9 +247,7 @@ function App() {
     setSelected(location);
     setBouncingId(location.location_id);
 
-    if (bounceTimerRef.current) {
-      clearTimeout(bounceTimerRef.current);
-    }
+    if (bounceTimerRef.current) clearTimeout(bounceTimerRef.current);
 
     bounceTimerRef.current = setTimeout(() => {
       setBouncingId(null);
@@ -309,10 +307,7 @@ function App() {
             </div>
 
             <div style={{ position: "absolute", bottom: "25px", left: "12px", zIndex: 10, backgroundColor: "white", padding: showStructure ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "320px", maxHeight: showStructure ? "38vh" : "36px", overflowY: "auto", fontSize: "11px", lineHeight: "1.5", color: "#111" }}>
-              <div
-                onClick={() => setShowStructure(!showStructure)}
-                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}
-              >
+              <div onClick={() => setShowStructure(!showStructure)} style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}>
                 📁 종합 데이터 구조 <span style={{ fontSize: "15px", fontWeight: "900" }}>{showStructure ? "▲" : "▼"}</span>
               </div>
 
@@ -350,12 +345,19 @@ function App() {
 
               <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #ddd" }} />
 
+              <div style={{ fontWeight: "800", marginBottom: "5px", color: "#2c3e50", textAlign: "center" }}>🧭 구간 관리 체계</div>
+              A구간: 4공학관 ~ 건축관<br />
+              B구간: 건축관 ~ 함박관<br />
+              C구간: 함박관 ~ 체육관
+
+              <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #ddd" }} />
+
               <div style={{ display: "flex", gap: "5px" }}>
                 <input
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  placeholder="예: A-01"
+                  placeholder="예: A-1"
                   style={{ flex: 1, height: "26px", padding: "4px 6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px", boxSizing: "border-box" }}
                 />
                 <button onClick={handleSearch} style={{ height: "26px", padding: "3px 8px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>
@@ -365,10 +367,7 @@ function App() {
             </div>
 
             <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: showStats ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "285px", maxHeight: showStats ? "47vh" : "36px", overflowY: "auto", fontSize: "12px", color: "#111" }}>
-              <div
-                onClick={() => setShowStats(!showStats)}
-                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}
-              >
+              <div onClick={() => setShowStats(!showStats)} style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}>
                 📊 전체 통계 및 그래프 <span style={{ fontSize: "15px", fontWeight: "900" }}>{showStats ? "▲" : "▼"}</span>
               </div>
 
@@ -397,11 +396,7 @@ function App() {
               key={location.location_id}
               position={{ lat: location.lat, lng: location.lng }}
               icon={getMarkerIcon(markerColor)}
-              animation={
-                isBouncing && window.google
-                  ? window.google.maps.Animation.BOUNCE
-                  : undefined
-              }
+              animation={isBouncing && window.google ? window.google.maps.Animation.BOUNCE : undefined}
               onClick={() => selectLocation(location)}
               label={{ text: location.location_id, color: "white", fontSize: "10px", fontWeight: "bold" }}
             />
