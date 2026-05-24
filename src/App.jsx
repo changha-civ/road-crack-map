@@ -177,6 +177,8 @@ function App() {
   const [cracks, setCracks] = useState([]);
   const [selected, setSelected] = useState(null);
   const [showPanel, setShowPanel] = useState(true);
+  const [showStats, setShowStats] = useState(false);
+  const [showStructure, setShowStructure] = useState(false);
   const [searchText, setSearchText] = useState("");
   const mapRef = useRef(null);
 
@@ -279,65 +281,94 @@ function App() {
 
         {showPanel && (
           <>
-            <div style={{ position: "absolute", top: "115px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "245px", fontSize: "12px", lineHeight: "1.55", color: "#111" }}>
-              <div style={{ fontWeight: "800", marginBottom: "7px", color: "#2c3e50", textAlign: "center" }}>📂 데이터 관리 방식</div>
-              📍 위치 기준 관리<br />
-              🗓️ 날짜별 이력 저장<br />
-              📊 균열률 변화 추적<br />
-              🛠️ 보수 전/후 비교 가능<br />
-              🧾 Google Sheets 자동 연동
-            </div>
-
-            <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "280px", maxHeight: "47vh", overflowY: "auto", fontSize: "12px", color: "#111" }}>
-              <div style={{ fontWeight: "800", marginBottom: "7px", color: "#2c3e50", textAlign: "center" }}>📊 전체 통계 및 그래프</div>
-              <div style={{ padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px", fontWeight: "bold", textAlign: "center" }}>
-                등록 위치 수: {cracks.length}개<br />
-                평균 최신 균열률: {averageRate}%
-              </div>
-              <VerticalTypeBarChart typeCount={typeCount} />
-              <AverageRateLineChart cracks={cracks} getSortedHistory={getSortedHistory} />
-            </div>
-
-            <div style={{ position: "absolute", top: "115px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "180px", fontSize: "12px", lineHeight: "1.6", color: "#111" }}>
+            <div style={{ position: "absolute", top: "115px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "210px", fontSize: "12px", lineHeight: "1.6", color: "#111" }}>
               <div style={{ fontWeight: "800", marginBottom: "7px", color: "#2c3e50", textAlign: "center" }}>⚠️ 위험도 기준</div>
               🟢 양호 0~10%<br />
               ⚠️ 주의 10~30%<br />
               🚨 위험 30% 이상
-            </div>
 
-            <div style={{ position: "absolute", top: "245px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "210px" }}>
-              <div style={{ display: "flex", gap: "5px" }}>
-                <input value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="예: A-01" style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }} />
-                <button onClick={handleSearch} style={{ padding: "6px 9px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>검색</button>
-              </div>
-            </div>
+              <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #ddd" }} />
 
-            <div style={{ position: "absolute", bottom: "25px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "190px", fontSize: "11px", lineHeight: "1.6", color: "#111" }}>
               <div style={{ fontWeight: "800", marginBottom: "6px", color: "#2c3e50", textAlign: "center" }}>📍 마커 범례</div>
               <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열<br />
               <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열<br />
               <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
             </div>
 
-            <div style={{ position: "absolute", bottom: "25px", left: "50%", transform: "translateX(-50%)", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "310px", maxHeight: "35vh", overflowY: "auto", fontSize: "11px", lineHeight: "1.5", color: "#111" }}>
-              <div style={{ fontWeight: "800", marginBottom: "6px", color: "#2c3e50", textAlign: "center" }}>📁 종합 데이터 구조</div>
-              {cracks.map((location) => {
-                const history = getSortedHistory(location);
-                return (
-                  <div key={location.location_id} style={{ marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #ddd" }}>
-                    <strong>📍 {location.location_id}</strong> / {location.section}구간<br />
-                    좌표: {location.lat}, {location.lng}
-                    {history.map((item, index) => (
-                      <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
-                        🗓️ {item.date} └ {item.event} / {item.crack_type} / {item.crack_rate}%
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-              <div style={{ marginTop: "6px", fontSize: "11px", color: "#333", textAlign: "center" }}>
-                ※ Google Sheets에 데이터를 추가하면 웹사이트 새로고침 시 자동 반영됩니다.
+            <div style={{ position: "absolute", bottom: "25px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "320px", maxHeight: showStructure ? "38vh" : "48px", overflowY: "auto", fontSize: "11px", lineHeight: "1.5", color: "#111" }}>
+              <div
+                onClick={() => setShowStructure(!showStructure)}
+                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer" }}
+              >
+                📁 종합 데이터 구조 {showStructure ? "▲" : "▼"}
               </div>
+
+              {showStructure && (
+                <>
+                  {cracks.map((location) => {
+                    const history = getSortedHistory(location);
+                    return (
+                      <div key={location.location_id} style={{ marginTop: "8px", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #ddd" }}>
+                        <strong>📍 {location.location_id}</strong> / {location.section}구간<br />
+                        좌표: {location.lat}, {location.lng}
+                        {history.map((item, index) => (
+                          <div key={index} style={{ marginLeft: "6px", marginTop: "3px" }}>
+                            🗓️ {item.date} └ {item.event} / {item.crack_type} / {item.crack_rate}%
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+
+                  <div style={{ marginTop: "6px", fontSize: "11px", color: "#333", textAlign: "center" }}>
+                    ※ Google Sheets에 데이터를 추가하면 웹사이트 새로고침 시 자동 반영됩니다.
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div style={{ position: "absolute", top: "115px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "255px", fontSize: "12px", lineHeight: "1.55", color: "#111" }}>
+              <div style={{ fontWeight: "800", marginBottom: "7px", color: "#2c3e50", textAlign: "center" }}>📂 데이터 관리 방식</div>
+              📍 위치 기준 관리<br />
+              🗓️ 날짜별 이력 저장<br />
+              📊 균열률 변화 추적<br />
+              🛠️ 보수 전/후 비교 가능<br />
+              🧾 Google Sheets 자동 연동
+
+              <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #ddd" }} />
+
+              <div style={{ display: "flex", gap: "5px" }}>
+                <input
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder="예: A-01"
+                  style={{ flex: 1, padding: "6px", border: "1px solid #ddd", borderRadius: "7px", fontSize: "12px" }}
+                />
+                <button onClick={handleSearch} style={{ padding: "6px 9px", border: "none", borderRadius: "7px", backgroundColor: "#2c3e50", color: "white", fontWeight: "bold", cursor: "pointer", fontSize: "12px" }}>
+                  검색
+                </button>
+              </div>
+            </div>
+
+            <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "285px", maxHeight: showStats ? "47vh" : "48px", overflowY: "auto", fontSize: "12px", color: "#111" }}>
+              <div
+                onClick={() => setShowStats(!showStats)}
+                style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer" }}
+              >
+                📊 전체 통계 및 그래프 {showStats ? "▲" : "▼"}
+              </div>
+
+              {showStats && (
+                <>
+                  <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px", fontWeight: "bold", textAlign: "center" }}>
+                    등록 위치 수: {cracks.length}개<br />
+                    평균 최신 균열률: {averageRate}%
+                  </div>
+                  <VerticalTypeBarChart typeCount={typeCount} />
+                  <AverageRateLineChart cracks={cracks} getSortedHistory={getSortedHistory} />
+                </>
+              )}
             </div>
           </>
         )}
