@@ -81,11 +81,16 @@ function CrackRateGraph({ history }) {
         <text x={padding - 8} y={height - padding + 4} textAnchor="end" fontSize="10">0%</text>
 
         <polyline points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#2c3e50" strokeWidth="3" />
+
         {points.map((p, index) => (
           <g key={index}>
             <circle cx={p.x} cy={p.y} r="6" fill={getRiskInfo(p.item.crack_rate).color} />
-            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="12" fontWeight="700">{p.item.crack_rate}%</text>
-            <text x={p.x} y={height - 10} textAnchor="middle" fontSize="11">{p.item.date?.slice(5)}</text>
+            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="12" fontWeight="700">
+              {p.item.crack_rate}%
+            </text>
+            <text x={p.x} y={height - 10} textAnchor="middle" fontSize="11">
+              {p.item.date?.slice(5)}
+            </text>
           </g>
         ))}
       </svg>
@@ -109,6 +114,7 @@ function VerticalTypeBarChart({ typeCount }) {
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
+
         {entries.map(([type, count], index) => {
           const gap = (width - padding * 2) / entries.length;
           const x = padding + gap * index + gap / 2 - barWidth / 2;
@@ -118,8 +124,12 @@ function VerticalTypeBarChart({ typeCount }) {
           return (
             <g key={type}>
               <rect x={x} y={y} width={barWidth} height={barHeight} rx="5" fill={getMarkerColor(type)} />
-              <text x={x + barWidth / 2} y={y - 7} textAnchor="middle" fontSize="11" fontWeight="800">{count}개</text>
-              <text x={x + barWidth / 2} y={height - 8} textAnchor="middle" fontSize="10">{type.replace("균열", "")}</text>
+              <text x={x + barWidth / 2} y={y - 7} textAnchor="middle" fontSize="11" fontWeight="800">
+                {count}개
+              </text>
+              <text x={x + barWidth / 2} y={height - 8} textAnchor="middle" fontSize="10">
+                {type.replace("균열", "")}
+              </text>
             </g>
           );
         })}
@@ -160,7 +170,7 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
 
   return (
     <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
-      <strong>📈 전체 평균 균열률 변화</strong>
+      <strong>📈 날짜별 등록 데이터 평균 균열률 변화</strong>
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
@@ -168,14 +178,125 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
         <text x={padding - 8} y={height - padding + 4} textAnchor="end" fontSize="10">0%</text>
 
         <polyline points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#2c3e50" strokeWidth="3" />
+
         {points.map((p, index) => (
           <g key={index}>
             <circle cx={p.x} cy={p.y} r="5" fill={getRiskInfo(p.item.avg).color} />
-            <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="11" fontWeight="700">{p.item.avg.toFixed(1)}%</text>
-            <text x={p.x} y={height - 9} textAnchor="middle" fontSize="10">{p.item.date.slice(5)}</text>
+            <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="11" fontWeight="700">
+              {p.item.avg.toFixed(1)}%
+            </text>
+            <text x={p.x} y={height - 9} textAnchor="middle" fontSize="10">
+              {p.item.date.slice(5)}
+            </text>
           </g>
         ))}
       </svg>
+    </div>
+  );
+}
+
+function RiskSummaryCard({ latestData }) {
+  const counts = latestData.reduce(
+    (acc, item) => {
+      const risk = getRiskInfo(item?.crack_rate);
+      acc[risk.label] = (acc[risk.label] || 0) + 1;
+      return acc;
+    },
+    { 양호: 0, 주의: 0, 위험: 0 }
+  );
+
+  return (
+    <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7f7f7", borderRadius: "8px" }}>
+      <strong>🧭 위험도 등급 분포</strong>
+      <div style={{ marginTop: "6px", display: "grid", gap: "5px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "800", color: "#27ae60" }}>
+          <span>🟢 양호</span>
+          <span>{counts.양호}개</span>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "800", color: "#f39c12" }}>
+          <span>⚠️ 주의</span>
+          <span>{counts.주의}개</span>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "800", color: "#e74c3c" }}>
+          <span>🚨 위험</span>
+          <span>{counts.위험}개</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TopRiskCard({ cracks, getSortedHistory }) {
+  const beforeData = cracks
+    .map((location) => {
+      const history = getSortedHistory(location);
+      const first = history[0];
+      return {
+        location_id: location.location_id,
+        rate: Number(first?.crack_rate || 0),
+        type: first?.crack_type || "균열",
+      };
+    })
+    .sort((a, b) => b.rate - a.rate)
+    .slice(0, 2);
+
+  if (beforeData.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#fff7f7", borderRadius: "8px", border: "1px solid #f1c4c4" }}>
+      <strong style={{ color: "#c0392b" }}>🚨 보수 우선 검토 구간 TOP2</strong>
+      {beforeData.map((item, index) => (
+        <div key={item.location_id} style={{ marginTop: "6px", display: "flex", justifyContent: "space-between", fontWeight: "800" }}>
+          <span>
+            {index + 1}. {item.location_id} / {item.type}
+          </span>
+          <span style={{ color: getRiskInfo(item.rate).color }}>{item.rate.toFixed(2)}%</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MaintenanceEffectCard({ cracks, getSortedHistory }) {
+  let beforeSum = 0;
+  let repairSum = 0;
+  let recrackSum = 0;
+  let beforeCount = 0;
+  let repairCount = 0;
+  let recrackCount = 0;
+
+  cracks.forEach((location) => {
+    getSortedHistory(location).forEach((item) => {
+      const event = item.event || "";
+      const rate = Number(item.crack_rate || 0);
+
+      if (event.includes("보수전") || event.includes("보수 전")) {
+        beforeSum += rate;
+        beforeCount += 1;
+      } else if (event.includes("보수후") || event.includes("보수 후")) {
+        repairSum += rate;
+        repairCount += 1;
+      } else if (event.includes("재균열")) {
+        recrackSum += rate;
+        recrackCount += 1;
+      }
+    });
+  });
+
+  const beforeAvg = beforeCount ? beforeSum / beforeCount : 0;
+  const repairAvg = repairCount ? repairSum / repairCount : 0;
+  const recrackAvg = recrackCount ? recrackSum / recrackCount : 0;
+  const reduction = beforeAvg ? (((beforeAvg - repairAvg) / beforeAvg) * 100).toFixed(1) : "0.0";
+
+  return (
+    <div style={{ marginTop: "8px", padding: "8px", backgroundColor: "#f7fbff", borderRadius: "8px", border: "1px solid #cfe5ff" }}>
+      <strong style={{ color: "#2c3e50" }}>🛠️ 보수 효과 요약</strong>
+      <div style={{ marginTop: "6px", lineHeight: "1.7", fontWeight: "700" }}>
+        보수 전 평균: {beforeAvg.toFixed(1)}%<br />
+        보수 후 평균: {repairAvg.toFixed(1)}%<br />
+        평균 감소율: <span style={{ color: "#27ae60", fontWeight: "900" }}>{reduction}%</span><br />
+        {recrackCount > 0 && <>재균열 후 평균: {recrackAvg.toFixed(1)}%</>}
+      </div>
     </div>
   );
 }
@@ -309,8 +430,7 @@ function App() {
 
               <div style={{ fontWeight: "800", marginBottom: "6px", color: "#2c3e50", textAlign: "center" }}>📍 마커 범례</div>
               <span style={{ color: "#e74c3c", fontWeight: "bold" }}>●</span> 망상균열<br />
-              <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열<br />
-              <span style={{ color: "#3498db", fontWeight: "bold" }}>●</span> 기타손상
+              <span style={{ color: "#f39c12", fontWeight: "bold" }}>●</span> 선형균열
             </div>
 
             <div style={{ position: "absolute", bottom: "25px", left: "12px", zIndex: 10, backgroundColor: "white", padding: showStructure ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "320px", maxHeight: showStructure ? "38vh" : "36px", overflowY: "auto", fontSize: "11px", lineHeight: "1.5", color: "#111" }}>
@@ -344,11 +464,11 @@ function App() {
 
             <div style={{ position: "absolute", top: "115px", right: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "255px", fontSize: "12px", lineHeight: "1.55", color: "#111" }}>
               <div style={{ fontWeight: "800", marginBottom: "7px", color: "#2c3e50", textAlign: "center" }}>📂 데이터 관리 방식</div>
-              📍 위치 기준 관리<br />
-              🗓️ 날짜별 이력 저장<br />
-              📊 균열률 변화 추적<br />
-              🛠️ 보수 전/후 비교 가능<br />
-              🧾 Google Sheets 자동 연동
+              📍 위치 기반 균열 데이터 관리<br />
+              🗓️ 날짜별 유지관리 이력 저장<br />
+              📊 균열률 변화 및 감소율 분석<br />
+              🛠️ 보수 전·후 및 재균열 비교<br />
+              🧾 Google Sheets 기반 자동 반영
 
               <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #ddd" }} />
 
@@ -382,8 +502,11 @@ function App() {
                 <>
                   <div style={{ marginTop: "8px", padding: "7px", backgroundColor: "#f7f7f7", borderRadius: "8px", fontWeight: "bold", textAlign: "center" }}>
                     등록 위치 수: {cracks.length}개<br />
-                    평균 최신 균열률: {averageRate}%
+                    전체 위치 최신 균열률 평균: {averageRate}%
                   </div>
+                  <RiskSummaryCard latestData={latestData} />
+                  <MaintenanceEffectCard cracks={cracks} getSortedHistory={getSortedHistory} />
+                  <TopRiskCard cracks={cracks} getSortedHistory={getSortedHistory} />
                   <VerticalTypeBarChart typeCount={typeCount} />
                   <AverageRateLineChart cracks={cracks} getSortedHistory={getSortedHistory} />
                 </>
