@@ -11,8 +11,9 @@ const calcReduction = (before, after) => {
 };
 
 const getRiskInfo = (rate) => {
-  if (rate >= 30) return { label: "위험", icon: "🚨", color: "#e74c3c" };
-  if (rate >= 10) return { label: "주의", icon: "⚠️", color: "#f39c12" };
+  const value = Number(rate || 0);
+  if (value >= 5) return { label: "위험", icon: "🚨", color: "#e74c3c" };
+  if (value >= 1) return { label: "주의", icon: "⚠️", color: "#f39c12" };
   return { label: "양호", icon: "🟢", color: "#27ae60" };
 };
 
@@ -59,10 +60,10 @@ const parseCSV = (text) => {
 function CrackRateGraph({ history }) {
   if (!history || history.length < 2) return null;
 
-  const width = 420;
-  const height = 130;
-  const padding = 28;
-  const maxRate = Math.max(...history.map((h) => Number(h.crack_rate || 0)), 40);
+  const width = 460;
+  const height = 220;
+  const padding = 35;
+  const maxRate = 10;
 
   const points = history.map((item, index) => {
     const x = padding + (index * (width - padding * 2)) / Math.max(history.length - 1, 1);
@@ -76,12 +77,15 @@ function CrackRateGraph({ history }) {
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
+        <text x={padding - 8} y={padding + 4} textAnchor="end" fontSize="10">10%</text>
+        <text x={padding - 8} y={height - padding + 4} textAnchor="end" fontSize="10">0%</text>
+
         <polyline points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#2c3e50" strokeWidth="3" />
         {points.map((p, index) => (
           <g key={index}>
-            <circle cx={p.x} cy={p.y} r="5" fill={getRiskInfo(p.item.crack_rate).color} />
-            <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="11" fontWeight="700">{p.item.crack_rate}%</text>
-            <text x={p.x} y={height - 8} textAnchor="middle" fontSize="10">{p.item.date?.slice(5)}</text>
+            <circle cx={p.x} cy={p.y} r="6" fill={getRiskInfo(p.item.crack_rate).color} />
+            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="12" fontWeight="700">{p.item.crack_rate}%</text>
+            <text x={p.x} y={height - 10} textAnchor="middle" fontSize="11">{p.item.date?.slice(5)}</text>
           </g>
         ))}
       </svg>
@@ -143,10 +147,10 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
 
   if (data.length < 2) return null;
 
-  const width = 250;
-  const height = 115;
-  const padding = 25;
-  const maxRate = Math.max(...data.map((d) => d.avg), 40);
+  const width = 300;
+  const height = 220;
+  const padding = 35;
+  const maxRate = 10;
 
   const points = data.map((item, index) => {
     const x = padding + (index * (width - padding * 2)) / Math.max(data.length - 1, 1);
@@ -160,12 +164,15 @@ function AverageRateLineChart({ cracks, getSortedHistory }) {
       <svg width="100%" viewBox={`0 0 ${width} ${height}`}>
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#bbb" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#bbb" />
+        <text x={padding - 8} y={padding + 4} textAnchor="end" fontSize="10">10%</text>
+        <text x={padding - 8} y={height - padding + 4} textAnchor="end" fontSize="10">0%</text>
+
         <polyline points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#2c3e50" strokeWidth="3" />
         {points.map((p, index) => (
           <g key={index}>
-            <circle cx={p.x} cy={p.y} r="4" fill={getRiskInfo(p.item.avg).color} />
-            <text x={p.x} y={p.y - 8} textAnchor="middle" fontSize="10" fontWeight="700">{p.item.avg.toFixed(1)}%</text>
-            <text x={p.x} y={height - 7} textAnchor="middle" fontSize="9">{p.item.date.slice(5)}</text>
+            <circle cx={p.x} cy={p.y} r="5" fill={getRiskInfo(p.item.avg).color} />
+            <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="11" fontWeight="700">{p.item.avg.toFixed(1)}%</text>
+            <text x={p.x} y={height - 9} textAnchor="middle" fontSize="10">{p.item.date.slice(5)}</text>
           </g>
         ))}
       </svg>
@@ -294,9 +301,9 @@ function App() {
           <>
             <div style={{ position: "absolute", top: "115px", left: "12px", zIndex: 10, backgroundColor: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "210px", fontSize: "12px", lineHeight: "1.6", color: "#111" }}>
               <div style={{ fontWeight: "800", marginBottom: "7px", color: "#2c3e50", textAlign: "center" }}>⚠️ 위험도 기준</div>
-              🟢 양호 0~10%<br />
-              ⚠️ 주의 10~30%<br />
-              🚨 위험 30% 이상
+              🟢 양호 0~1%<br />
+              ⚠️ 주의 1~5%<br />
+              🚨 위험 5% 이상
 
               <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #ddd" }} />
 
@@ -366,7 +373,7 @@ function App() {
               </div>
             </div>
 
-            <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: showStats ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "285px", maxHeight: showStats ? "47vh" : "36px", overflowY: "auto", fontSize: "12px", color: "#111" }}>
+            <div style={{ position: "absolute", bottom: "25px", right: "12px", zIndex: 10, backgroundColor: "white", padding: showStats ? "10px" : "7px 10px", borderRadius: "12px", boxShadow: "0 3px 10px rgba(0,0,0,0.25)", width: "285px", maxHeight: showStats ? "60vh" : "36px", overflowY: "auto", fontSize: "12px", color: "#111" }}>
               <div onClick={() => setShowStats(!showStats)} style={{ fontWeight: "800", color: "#2c3e50", textAlign: "center", cursor: "pointer", lineHeight: "20px" }}>
                 📊 전체 통계 및 그래프 <span style={{ fontSize: "15px", fontWeight: "900" }}>{showStats ? "▲" : "▼"}</span>
               </div>
